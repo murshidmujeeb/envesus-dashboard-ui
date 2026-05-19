@@ -1,0 +1,461 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SmartBin IQ — Calicut Municipal Waste Management</title>
+<link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+</head>
+<body>
+
+<div class="app-wrapper">
+  <div class="dashboard-container">
+    
+    <!-- SIDEBAR -->
+    <nav class="sidebar">
+      <div class="logo-wrap">
+        <div class="logo-icon"><i class="ti ti-recycle"></i></div>
+      </div>
+      
+      <div class="nav-item active" onclick="switchTab('dashboard')" title="Dashboard">
+        <i class="ti ti-layout-dashboard"></i>
+      </div>
+      <div class="nav-item" onclick="switchTab('monitoring')" title="Bin Monitoring">
+        <i class="ti ti-map-pin"></i>
+      </div>
+      <div class="nav-item" onclick="switchTab('routes')" title="Route Optimization">
+        <i class="ti ti-route"></i>
+      </div>
+      <div class="nav-item" onclick="switchTab('analytics')" title="Analytics">
+        <i class="ti ti-chart-bar"></i>
+      </div>
+      <div class="nav-item" onclick="switchTab('cameras')" title="Cameras">
+        <i class="ti ti-video"></i>
+      </div>
+      <div class="nav-item" onclick="switchTab('alerts')" title="Alerts">
+        <i class="ti ti-bell"></i><div class="nav-badge"></div>
+      </div>
+      <div class="nav-item" onclick="switchTab('fleet')" title="Fleet">
+        <i class="ti ti-truck"></i>
+      </div>
+      
+      <div style="flex:1"></div>
+      
+      <div class="nav-item" onclick="openModal('help-modal')" title="Help">
+        <i class="ti ti-help"></i>
+      </div>
+      <div class="nav-item" onclick="openModal('settings-modal')" title="Settings">
+        <i class="ti ti-settings"></i>
+      </div>
+    </nav>
+
+    <!-- MAIN -->
+    <div class="main">
+      <!-- TOPBAR -->
+      <header class="topbar">
+        <div class="page-header">
+          <div class="page-subtitle">Real-Time Waste Management System</div>
+          <h1 class="page-title" id="page-title">Overview Dashboard</h1>
+        </div>
+        
+        <div class="topbar-center">
+          <div class="tab-pill active" onclick="setTimeFilter(this, 'today')">Today</div>
+          <div class="tab-pill" onclick="setTimeFilter(this, 'week')">This Week</div>
+          <div class="tab-pill" onclick="setTimeFilter(this, 'month')">This Month</div>
+          <div class="tab-pill" onclick="switchTab('reports'); updatePill(this);">Reports</div>
+        </div>
+        
+        <div class="topbar-right">
+          <div class="topbar-icon-btn"><i class="ti ti-mail"></i></div>
+          <div class="topbar-icon-btn" onclick="switchTab('alerts')"><i class="ti ti-bell"></i><div class="dot"></div></div>
+          <div class="topbar-icon-btn" onclick="triggerExport()"><i class="ti ti-download"></i></div>
+          <div class="topbar-icon-btn" onclick="openModal('settings-modal')"><i class="ti ti-settings"></i></div>
+          
+          <div class="user-profile" onclick="showToast('Profile clicked')">
+            <div class="avatar">AD</div>
+            <div class="user-info">
+              <div class="user-name">Admin Calicut</div>
+              <div class="user-role">Municipal Officer</div>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main class="content">
+        <!-- SEARCH -->
+        <div class="search-container">
+          <div class="search-box">
+            <i class="ti ti-search"></i>
+            <input type="text" class="search-input" placeholder="Search bins, zones, locations..." id="global-search" oninput="handleSearch(this.value)">
+          </div>
+        </div>
+
+        <!-- ═══ DASHBOARD TAB ═══ -->
+        <div id="tab-dashboard" class="tab-content active">
+          
+          <!-- STAT CARDS (Matched to reference design) -->
+          <div class="stat-card-row">
+            <div class="stat-card">
+              <div class="stat-card-title">Total Bins</div>
+              <div class="stat-card-value">50</div>
+              <div class="stat-card-subtitle text-success">All Online</div>
+              <div class="stat-card-icon" style="background:#dbeafe;color:#3b82f6;"><i class="ti ti-trash"></i></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Avg Fill Level</div>
+              <div class="stat-card-value" id="dash-avg-fill">62%</div>
+              <div class="stat-card-subtitle text-success">+8% vs yesterday</div>
+              <div class="stat-card-icon" style="background:#fef3c7;color:#f59e0b;"><i class="ti ti-chart-bar"></i></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Critical Bins</div>
+              <div class="stat-card-value" id="dash-critical">7</div>
+              <div class="stat-card-subtitle text-critical">Needs immediate collection</div>
+              <div class="stat-card-icon" style="background:#fee2e2;color:#ef4444;"><i class="ti ti-alert-triangle"></i></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Collections Today</div>
+              <div class="stat-card-value">23</div>
+              <div class="stat-card-subtitle text-success">On schedule</div>
+              <div class="stat-card-icon" style="background:#d1fae5;color:#10b981;"><i class="ti ti-truck"></i></div>
+            </div>
+            <div class="stat-card">
+              <div class="stat-card-title">Waste Collected</div>
+              <div class="stat-card-value">4.2t</div>
+              <div class="stat-card-subtitle text-success">+12% recycled</div>
+              <div class="stat-card-icon" style="background:#f3f4f6;color:#111827;"><i class="ti ti-recycle"></i></div>
+            </div>
+          </div>
+
+          <!-- ROW 1 -->
+          <div style="display:grid; grid-template-columns: 6fr 4fr; gap:24px; margin-bottom:24px;">
+            <!-- LIVE MAP (60%) -->
+            <div class="card" style="display:flex; flex-direction:column; min-width: 0;">
+              <div class="card-header">
+                <h2 class="card-title">Live Bin Map</h2>
+                <div class="badge badge-success"><span class="live-dot" style="display:inline-block;width:6px;height:6px;background:var(--success);border-radius:50%;margin-right:6px;animation:pulse 2s infinite;"></span> LIVE OSM</div>
+              </div>
+              <div id="map" style="flex:1; min-height:400px;"></div>
+            </div>
+
+            <!-- RIGHT COLUMN (40%) -->
+            <div style="display:flex; flex-direction:column; gap:24px; min-width: 0;">
+              <!-- ACTIVE ALERTS -->
+              <div class="card" style="flex:1; display:flex; flex-direction:column;">
+                <div class="card-header">
+                  <h2 class="card-title">Active Alerts</h2>
+                  <div class="card-action" onclick="switchTab('alerts')"><i class="ti ti-arrow-up-right"></i></div>
+                </div>
+                <div class="item-list" id="dash-alerts-list" style="flex:1; max-height: 200px; overflow-y: auto; padding-right: 8px;">
+                  <!-- Populated by JS -->
+                </div>
+              </div>
+
+              <!-- ZONE CHART -->
+              <div class="card" style="flex:1; display:flex; flex-direction:column;">
+                <div class="card-header">
+                  <h2 class="card-title">Waste by Zone</h2>
+                  <div class="card-action"><i class="ti ti-adjustments-horizontal"></i></div>
+                </div>
+                <div style="flex:1; min-height:180px; position:relative;"><canvas id="zoneChart"></canvas></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- ROW 2 -->
+          <div style="display:grid; grid-template-columns: 4fr 6fr; gap:24px; margin-bottom:24px;">
+            <!-- LEFT COLUMN (40%) WIDGETS -->
+            <div style="display:flex; flex-direction:column; gap:24px; min-width: 0;">
+              <!-- ENVIRONMENTAL OVERVIEW -->
+              <div class="card">
+                <div class="card-header">
+                  <h2 class="card-title">Environmental Overview</h2>
+                </div>
+                <div class="card-body" style="padding:0;">
+                  <div style="display:flex;gap:12px;">
+                    <div style="flex:1; background:var(--bg);padding:16px;border-radius:var(--r-sm);">
+                      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;">Avg Temp</div>
+                      <div style="font-size:24px;font-weight:700;color:var(--warning);font-family:var(--mono);">32.4°C</div>
+                      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;"><i class="ti ti-arrow-up text-warning"></i> +1.2°C</div>
+                    </div>
+                    <div style="flex:1; background:var(--bg);padding:16px;border-radius:var(--r-sm);">
+                      <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;">Odor Index</div>
+                      <div style="font-size:24px;font-weight:700;color:var(--critical);font-family:var(--mono);">46 AQI</div>
+                      <div style="font-size:11px;color:var(--text-muted);margin-top:4px;"><i class="ti ti-alert-triangle text-critical"></i> Elevated</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- AI INSIGHTS -->
+              <div class="card" style="flex:1;">
+                <div class="card-header">
+                  <h2 class="card-title">AI Insights</h2>
+                  <div class="card-action"><i class="ti ti-brain"></i></div>
+                </div>
+                <div class="item-list">
+                  <div class="item-card" style="align-items:flex-start;background:var(--info-bg);border-color:transparent;padding:12px;">
+                    <i class="ti ti-chart-line" style="color:var(--info);font-size:20px;margin-right:10px;"></i>
+                    <div style="flex:1;">
+                      <div style="font-size:12px;color:var(--text);line-height:1.4;"><b>SM Street</b> bins fill faster on Tuesdays.</div>
+                    </div>
+                  </div>
+                  <div class="item-card" style="align-items:flex-start;background:var(--warning-bg);border-color:transparent;padding:12px;">
+                    <i class="ti ti-cloud-rain" style="color:var(--warning);font-size:20px;margin-right:10px;"></i>
+                    <div style="flex:1;">
+                      <div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Rain forecast.</b> Organic bins capacity reaching limits.</div>
+                    </div>
+                  </div>
+                  <div class="item-card" style="align-items:flex-start;background:var(--success-bg);border-color:transparent;padding:12px;">
+                    <i class="ti ti-route" style="color:var(--success);font-size:20px;margin-right:10px;"></i>
+                    <div style="flex:1;">
+                      <div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Route Merge:</b> Route #3 & #5 today to save ~18km.</div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- FILL MATRIX (60%) -->
+            <div class="card" style="display:flex; flex-direction:column; min-width: 0;">
+              <div class="card-header">
+                <h2 class="card-title">Fill Level Matrix</h2>
+              </div>
+              <div class="card-body" style="flex:1; display:flex; flex-direction:column; justify-content:center; padding: 24px;">
+                <div id="mini-bin-grid" class="bar-chart-scrollable"></div>
+                <div style="display:flex;gap:16px;margin-top:24px;font-size:12px;font-weight:600;color:var(--text-muted);justify-content:center;">
+                  <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:var(--success);border-radius:50%;display:inline-block;"></span> Normal</span>
+                  <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:var(--warning);border-radius:50%;display:inline-block;"></span> Warning</span>
+                  <span style="display:flex;align-items:center;gap:6px;"><span style="width:12px;height:12px;background:var(--critical);border-radius:50%;display:inline-block;"></span> Critical</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ MONITORING TAB ═══ -->
+        <div id="tab-monitoring" class="tab-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;">Real-Time Bin Status</h2>
+              <p class="text-muted" style="font-size:13px;margin-top:4px;">Manage and monitor all 50 smart bins across the municipality.</p>
+            </div>
+            <div style="display:flex;gap:12px;align-items:center;">
+              <select class="btn" style="border:1px solid var(--border-dark);" id="filter-zone" onchange="renderTable()">
+                <option value="">All Zones</option>
+                <option value="Mananchira">Mananchira</option>
+                <option value="SM Street">SM Street</option>
+                <option value="Palayam">Palayam</option>
+                <option value="Kottakkal">Kottakkal</option>
+                <option value="Calicut Beach">Calicut Beach</option>
+              </select>
+              <select class="btn" style="border:1px solid var(--border-dark);" id="filter-status" onchange="renderTable()">
+                <option value="">All Statuses</option>
+                <option value="critical">Critical (≥ 80%)</option>
+                <option value="warning">Warning (50-79%)</option>
+                <option value="normal">Normal (< 50%)</option>
+              </select>
+              <button class="btn btn-primary" onclick="document.getElementById('filter-zone').value='';document.getElementById('filter-status').value='';renderTable();showToast('Filters reset','success');"><i class="ti ti-refresh"></i> Reset</button>
+            </div>
+          </div>
+          <div class="card" style="padding:0;overflow:hidden;">
+            <div class="table-wrap" style="margin:0;">
+              <table>
+                <thead><tr><th>Bin ID</th><th>Location & Zone</th><th>Fill Level</th><th>Type</th><th>Sensors</th><th>Last Collected</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody id="bin-table-body"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ROUTES TAB ═══ -->
+        <div id="tab-routes" class="tab-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;">AI Route Optimization</h2>
+              <p class="text-muted" style="font-size:13px;margin-top:4px;">OSRM-based road routing with real-time traffic awareness.</p>
+            </div>
+          </div>
+          <div class="grid-2-1" style="grid-template-columns:1fr 2fr;">
+            <div style="display:flex;flex-direction:column;max-height:600px;overflow-y:auto;gap:16px;" id="route-cards-container"></div>
+            <div class="card" style="height:600px;padding:0;">
+              <div class="card-header" style="padding:24px 24px 16px;margin:0;">
+                <h2 class="card-title"><i class="ti ti-map-route text-blue"></i> Road Routing</h2>
+                <button class="btn btn-primary" onclick="dispatchAllRoutes()"><i class="ti ti-send"></i> Dispatch All</button>
+              </div>
+              <div id="route-map" style="border-radius:0 0 var(--r-lg) var(--r-lg);"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ ANALYTICS TAB ═══ -->
+        <div id="tab-analytics" class="tab-content">
+          <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;">Data Analytics & Trends</h2>
+          <div class="grid-2" style="grid-template-columns:1fr 1fr;">
+            <div class="card">
+              <div class="card-header"><h2 class="card-title">Monthly Waste Volume</h2></div>
+              <div style="height:250px;width:100%;"><canvas id="analytics-bar"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h2 class="card-title">Predictive Fill Analysis</h2></div>
+              <div style="height:250px;width:100%;"><canvas id="analytics-line"></canvas></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- ═══ CAMERAS TAB ═══ -->
+        <div id="tab-cameras" class="tab-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;">Surveillance Network</h2>
+              <p class="text-muted" style="font-size:13px;margin-top:4px;">Live feeds from bin-mounted cameras with motion detection.</p>
+            </div>
+            <div style="display:flex;gap:12px;">
+              <button class="btn" onclick="downloadFootage()"><i class="ti ti-download"></i> Download Logs</button>
+              <button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);" onclick="toggleRecording(this)"><i class="ti ti-player-record"></i> REC All</button>
+            </div>
+          </div>
+          
+          <style>
+            .cam-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+            .cam-feed { background:#111827; border-radius:var(--r-sm); aspect-ratio:16/9; position:relative; overflow:hidden; border:1px solid var(--border-dark); cursor:pointer; transition:transform 0.2s; }
+            .cam-feed:hover { transform:scale(1.02); }
+            .cam-feed canvas { width:100%; height:100%; display:block; opacity:0.85; }
+            .cam-overlay { position:absolute; inset:0; background:linear-gradient(to bottom,rgba(0,0,0,0.5) 0%,transparent 35%,transparent 65%,rgba(0,0,0,0.75) 100%); pointer-events:none; }
+            .cam-label { position:absolute; bottom:12px; left:16px; color:#fff; }
+            .cam-name { font-size:13px; font-weight:600; }
+            .cam-status { font-size:11px; color:#9ca3af; margin-top:2px; }
+            .cam-live { position:absolute; top:12px; right:12px; background:var(--red); color:#fff; font-size:10px; font-weight:700; padding:4px 8px; border-radius:var(--r-full); animation:pulse 2s infinite; letter-spacing:0.5px; }
+          </style>
+          
+          <div class="cam-grid" id="cam-grid-container"></div>
+        </div>
+
+        <!-- ═══ ALERTS TAB ═══ -->
+        <div id="tab-alerts" class="tab-content">
+          <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;">Notification Center</h2>
+          <div class="card"><div class="item-list" id="full-alerts-list"></div></div>
+        </div>
+
+        <!-- ═══ FLEET TAB ═══ -->
+        <div id="tab-fleet" class="tab-content">
+          <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;">Fleet Status</h2>
+          <div class="card">
+            <p class="text-muted" style="margin-bottom:24px;">Tracking integrated with GPS modules on 4 active trucks.</p>
+            <div class="item-list" id="fleet-list"></div>
+          </div>
+        </div>
+
+        <!-- ═══ REPORTS TAB ═══ -->
+        <div id="tab-reports" class="tab-content">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;">Executive Reports & Dashboards</h2>
+              <p class="text-muted" style="font-size:13px;margin-top:4px;">In-depth operational visualizations and exportable metrics.</p>
+            </div>
+            <button class="btn btn-primary" onclick="triggerExport()"><i class="ti ti-download"></i> Download PDF Report</button>
+          </div>
+          
+          <div class="grid-2">
+            <div class="card">
+              <div class="card-header"><h2 class="card-title">Collection Efficiency</h2></div>
+              <div style="height:250px;width:100%;"><canvas id="report-efficiency-chart"></canvas></div>
+            </div>
+            <div class="card">
+              <div class="card-header"><h2 class="card-title">Fleet Fuel Consumption (Liters)</h2></div>
+              <div style="height:250px;width:100%;"><canvas id="report-fuel-chart"></canvas></div>
+            </div>
+          </div>
+
+          <div class="card" style="margin-top:24px;">
+            <div class="card-header"><h2 class="card-title">Monthly Carbon Offset (CO2e)</h2></div>
+            <div style="height:300px;width:100%;"><canvas id="report-carbon-chart"></canvas></div>
+          </div>
+        </div>
+
+      </main>
+    </div>
+  </div>
+</div>
+
+<!-- MODALS -->
+<div id="toast-container"></div>
+
+<div class="modal-overlay" id="bin-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title" id="modal-bin-title">Bin Details</h2>
+      <button class="modal-close" onclick="closeModal('bin-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" id="modal-content"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('bin-modal')">Close</button>
+      <button class="btn btn-primary" onclick="scheduleCollection()"><i class="ti ti-truck"></i> Schedule Pickup</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settings-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">System Settings</h2>
+      <button class="modal-close" onclick="closeModal('settings-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <div style="margin-bottom:24px;">
+        <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;">Map Provider</label>
+        <select class="search-input" style="width:100%;padding:10px 16px;"><option>OpenStreetMap (Default)</option><option>Google Maps (API Key Required)</option><option>Mapbox Streets</option></select>
+      </div>
+      <div style="margin-bottom:24px;">
+        <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;">Data Refresh Rate</label>
+        <select class="search-input" style="width:100%;padding:10px 16px;"><option>Real-time (WebSockets)</option><option selected>Every 30 seconds</option><option>Every 5 minutes</option></select>
+      </div>
+      <div>
+        <label style="display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;font-weight:500;">
+          <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--primary);"> Enable SMS Alerts for Critical Bins
+        </label>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('settings-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveSettings()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="help-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Help & Documentation</h2>
+      <button class="modal-close" onclick="closeModal('help-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <h3 style="margin-bottom:12px;font-size:16px;">Dashboard Features</h3>
+      <ul style="padding-left:24px;line-height:2;color:var(--text-secondary);font-size:14px;margin-bottom:24px;">
+        <li><b>Map:</b> Uses OpenStreetMap for realistic geography.</li>
+        <li><b>Routing:</b> OSRM API generates actual road-based routes.</li>
+        <li><b>Analytics:</b> Predictive algorithms estimate bin capacity.</li>
+        <li><b>Cameras:</b> 8 bin-mounted cameras with motion detection.</li>
+      </ul>
+      <h3 style="margin-bottom:12px;font-size:16px;">Keyboard Shortcuts</h3>
+      <div style="font-size:14px;color:var(--text-secondary);line-height:2.5;">
+        <code style="background:var(--bg);padding:4px 10px;border-radius:6px;font-size:13px;border:1px solid var(--border-dark);">Ctrl+K</code> Search <br>
+        <code style="background:var(--bg);padding:4px 10px;border-radius:6px;font-size:13px;border:1px solid var(--border-dark);">Esc</code> Close modal
+      </div>
+      <div style="margin-top:24px;padding-top:16px;border-top:1px solid var(--border);">
+        <p class="text-muted" style="font-size:14px;">Support: <b>1800-SMART-CAL</b></p>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" onclick="closeModal('help-modal')">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script src="dashboard.js"></script>
+</body>
+</html>
