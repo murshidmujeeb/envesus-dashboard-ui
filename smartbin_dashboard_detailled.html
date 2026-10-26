@@ -842,8 +842,8 @@ function getStatusFromStr(s) {
 let mainMap, routeMap, markers=[];
 function initMap() {
   mainMap = L.map('map', {zoomControl:true, scrollWheelZoom:true}).setView([11.260,75.780],14);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{
-    attribution:'© OpenStreetMap © CartoDB',maxZoom:19
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_4uvs_1_f0e4596920d16f3e3e84916b',{
+    attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19
   }).addTo(mainMap);
   BINS.forEach(bin => {
     const color = bin.fill>=80?'#ef4444':bin.fill>=50?'#f59e0b':'#22c55e';
@@ -869,7 +869,7 @@ function initMap() {
 function initRouteMap() {
   if(routeMap) return;
   routeMap = L.map('route-map',{scrollWheelZoom:true}).setView([11.260,75.780],14);
-  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png',{maxZoom:19}).addTo(routeMap);
+  L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png?key=cb1_4uvs_1_f0e4596920d16f3e3e84916b',{attribution:'&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',subdomains:'abcd',maxZoom:19}).addTo(routeMap);
   ROUTES.forEach((route,ri) => {
     const binData = route.bins.map(id=>BINS.find(b=>b.id===id)).filter(Boolean);
     const latlngs = binData.map(b=>[b.lat,b.lng]);
