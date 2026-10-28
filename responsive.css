@@ -1,0 +1,225 @@
+/* ═══════════════════════════════════════════════════════
+   ENVESUS RESPONSIVE CSS
+   Mobile (320-430px), Tablet (768-1024px), Desktop (1280px+)
+═══════════════════════════════════════════════════════ */
+
+/* ─── MOBILE TOPBAR ─────────────────────────────────── */
+@media (max-width: 768px) {
+  .app-wrapper { padding: 0; }
+  .dashboard-container { border-radius: 0; box-shadow: none; }
+
+  .sidebar {
+    width: 100%;
+    height: 64px;
+    flex-direction: row;
+    padding: 0 12px;
+    order: 99;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    border-top: 1px solid var(--border);
+    border-radius: 0;
+    overflow-x: auto;
+    justify-content: space-around;
+  }
+
+  .logo-wrap { display: none; }
+
+  .sidebar > div[style*="flex:1"] { display: none; }
+
+  .nav-item { margin: 0; flex-shrink: 0; }
+
+  .main {
+    height: calc(100vh - 64px);
+    padding-bottom: 0;
+  }
+
+  .topbar {
+    padding: 16px 16px 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .topbar-center { order: 3; width: 100%; justify-content: center; overflow-x: auto; }
+  .topbar-right { gap: 8px; }
+  .user-info { display: none; }
+  .page-title { font-size: 20px; }
+
+  .content { padding: 12px 16px 80px; }
+
+  /* Stat cards stack */
+  .stat-card-row {
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .stat-card {
+    flex: 1 1 calc(50% - 6px);
+    min-width: 140px;
+    padding: 16px;
+  }
+  .stat-card-value { font-size: 24px; }
+
+  /* Map full width */
+  #tab-dashboard > div[style*="grid-template-columns: 6fr 4fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  #tab-dashboard > div[style*="grid-template-columns: 4fr 6fr"] {
+    grid-template-columns: 1fr !important;
+  }
+
+  #map { min-height: 280px !important; }
+
+  /* Routes tab */
+  #routes-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Tables: horizontal scroll */
+  .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+
+  /* Camera grid */
+  .cam-grid { grid-template-columns: 1fr 1fr !important; gap: 12px; }
+
+  /* Charts */
+  .grid-2 { grid-template-columns: 1fr !important; }
+  .grid-2-1 { grid-template-columns: 1fr !important; }
+}
+
+/* ─── SMALL MOBILE ──────────────────────────────────── */
+@media (max-width: 430px) {
+  .stat-card {
+    flex: 1 1 100%;
+  }
+  .cam-grid { grid-template-columns: 1fr !important; }
+  .topbar-center { display: none; }
+  .tab-pill { display: none; }
+}
+
+/* ─── TABLET ─────────────────────────────────────────── */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .app-wrapper { padding: 8px; }
+  .dashboard-container { border-radius: 24px; }
+
+  .sidebar { width: 72px; }
+
+  .topbar { padding: 20px 24px 12px; }
+  .content { padding: 12px 24px 32px; }
+
+  .page-title { font-size: 22px; }
+  .user-info { display: none; }
+
+  /* Stat cards: 3 per row on tablet */
+  .stat-card-row {
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .stat-card { flex: 1 1 calc(33.33% - 11px); min-width: 140px; }
+
+  /* Dashboard grids: tablet 2 col */
+  #tab-dashboard > div[style*="grid-template-columns: 6fr 4fr"] {
+    grid-template-columns: 1fr !important;
+  }
+  #tab-dashboard > div[style*="grid-template-columns: 4fr 6fr"] {
+    grid-template-columns: 1fr 1fr !important;
+  }
+
+  /* Routes */
+  #routes-layout {
+    grid-template-columns: 1fr !important;
+  }
+
+  /* Cameras */
+  .cam-grid { grid-template-columns: repeat(2, 1fr) !important; }
+
+  .grid-2 { grid-template-columns: 1fr 1fr; }
+}
+
+/* ─── DESKTOP LARGE ──────────────────────────────────── */
+@media (min-width: 1440px) {
+  .stat-card-value { font-size: 36px; }
+  .content { padding: 16px 48px 48px; }
+}
+
+/* ─── ROUTE CARDS SCROLLBAR ──────────────────────────── */
+#route-cards-container::-webkit-scrollbar { width: 4px; }
+#route-cards-container::-webkit-scrollbar-thumb { background: var(--border-dark); border-radius: 10px; }
+
+/* ─── FLEET CARDS ─────────────────────────────────────── */
+.fleet-card {
+  background: var(--surface);
+  border-radius: var(--r);
+  padding: 20px 24px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  gap: 20px;
+  align-items: center;
+}
+@media (max-width: 768px) {
+  .fleet-card { grid-template-columns: 1fr; }
+}
+
+.fleet-vehicle-icon {
+  width: 52px; height: 52px; border-radius: 16px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 26px; flex-shrink: 0;
+}
+
+.fleet-info { min-width: 0; }
+.fleet-vehicle-id { font-size: 15px; font-weight: 700; }
+.fleet-route-label { font-size: 13px; color: var(--text-muted); margin-top: 2px; }
+.fleet-staff-driver { font-size: 12px; color: var(--text-muted); margin-top: 6px; display: flex; gap: 16px; flex-wrap: wrap; }
+.fleet-staff-driver span { display: flex; align-items: center; gap: 5px; }
+
+.fleet-progress-wrap { min-width: 180px; }
+@media (max-width: 768px) { .fleet-progress-wrap { min-width: 0; } }
+
+.fleet-progress-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; }
+.fleet-progress-label { font-size: 13px; font-weight: 600; }
+.fleet-progress-pct { font-size: 13px; font-weight: 600; }
+
+/* ─── ROUTE CARD ─────────────────────────────────────── */
+.route-card {
+  background: var(--surface);
+  border-radius: var(--r);
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+  border-left: 4px solid transparent;
+}
+.route-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,0.1); transform: translateY(-2px); }
+.route-card.selected { border: 2px solid var(--primary); }
+
+.route-card-header { display: flex; align-items: flex-start; justify-content: space-between; margin-bottom: 10px; }
+.route-card-id { font-size: 12px; font-weight: 700; color: var(--text-muted); }
+.route-card-label { font-size: 14px; font-weight: 700; color: var(--text); margin-top: 2px; }
+.route-card-zone { font-size: 12px; color: var(--text-muted); margin-top: 2px; }
+
+.route-card-meta { display: flex; gap: 12px; font-size: 12px; color: var(--text-muted); flex-wrap: wrap; margin-bottom: 10px; }
+.route-card-meta span { display: flex; align-items: center; gap: 4px; }
+
+.route-card-assignment { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 10px; }
+.assignment-pill {
+  background: var(--bg); border: 1px solid var(--border-dark);
+  border-radius: var(--r-full); padding: 3px 10px;
+  font-size: 11px; font-weight: 600; color: var(--text-muted);
+  display: flex; align-items: center; gap: 5px;
+}
+
+/* ─── SECTION PULSE ANIMATION ────────────────────────── */
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ─── MOBILE HAMBURGER (for sidebar on mobile) ────────── */
+.mobile-menu-btn {
+  display: none;
+}
+@media (max-width: 768px) {
+  .mobile-menu-btn { display: flex; }
+}

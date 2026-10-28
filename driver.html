@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Envesus — Driver</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --primary: #1e3a5f;
+  --accent: #3b82f6;
+  --accent-light: #dbeafe;
+  --success: #10b981;
+  --success-bg: #d1fae5;
+  --warning: #f59e0b;
+  --warning-bg: #fef3c7;
+  --critical: #ef4444;
+  --critical-bg: #fee2e2;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --r: 16px;
+  --r-sm: 12px;
+  --r-full: 9999px;
+  --font: 'Plus Jakarta Sans', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #e2e8f0;
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+}
+
+/* ── PHONE CONTAINER ── */
+.phone-wrap {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+}
+
+@media (min-width: 500px) {
+  body { align-items: center; padding: 24px 16px; background: linear-gradient(135deg, #e2e8f0 0%, #dbeafe 100%); }
+  .phone-wrap {
+    min-height: calc(100vh - 48px);
+    max-height: 92vh;
+    border-radius: 36px;
+    overflow: hidden;
+    box-shadow: 0 32px 64px -12px rgba(0,0,0,0.25);
+  }
+}
+
+/* ── HEADER ── */
+.driver-header {
+  background: var(--primary);
+  color: white;
+  padding: 20px 20px 0;
+}
+.driver-header-top {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 16px;
+}
+.driver-brand { display: flex; align-items: center; gap: 10px; }
+.driver-brand-icon {
+  width: 36px; height: 36px; background: rgba(255,255,255,0.15);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 20px;
+}
+.driver-brand-name { font-size: 16px; font-weight: 700; }
+.driver-brand-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+.back-btn {
+  background: rgba(255,255,255,0.12); border: none; color: white;
+  border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: var(--font);
+  transition: background 0.2s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.2); }
+
+.driver-profile {
+  display: flex; align-items: center; gap: 14px;
+  background: rgba(255,255,255,0.08); border-radius: 14px; padding: 14px 16px;
+  margin-bottom: 16px;
+}
+.driver-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--accent); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; flex-shrink: 0;
+}
+.driver-name { font-size: 16px; font-weight: 700; }
+.driver-vehicle { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.driver-badge {
+  margin-left: auto; background: rgba(59,130,246,0.3); border: 1px solid rgba(59,130,246,0.5);
+  border-radius: var(--r-full); padding: 4px 12px; font-size: 11px; font-weight: 700;
+}
+
+/* ── ROUTE TABS ── */
+.route-tabs {
+  display: flex; gap: 4px; padding: 0 0 16px;
+  overflow-x: auto;
+}
+.route-tab {
+  background: rgba(255,255,255,0.1); border: 1px solid rgba(255,255,255,0.15);
+  color: rgba(255,255,255,0.7); border-radius: var(--r-full);
+  padding: 6px 16px; font-size: 12px; font-weight: 600;
+  cursor: pointer; white-space: nowrap; flex-shrink: 0;
+  transition: all 0.2s; font-family: var(--font);
+}
+.route-tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+
+/* ── CONTENT ── */
+.driver-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── MAP ── */
+.driver-map-card { background: var(--surface); border-radius: var(--r); overflow: hidden; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+.driver-map-header { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px; }
+.driver-map-title { font-size: 14px; font-weight: 700; }
+.demo-badge { background: #fef3c7; color: #92400e; border-radius: var(--r-full); padding: 3px 10px; font-size: 10px; font-weight: 700; }
+#driver-map { height: 220px; width: 100%; }
+
+/* ── ROUTE INFO ── */
+.route-info-row {
+  display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px;
+}
+.route-info-card {
+  background: var(--surface); border-radius: var(--r-sm); padding: 12px;
+  text-align: center; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.route-info-val { font-size: 18px; font-weight: 800; color: var(--text); }
+.route-info-label { font-size: 10px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+/* ── PROGRESS ── */
+.route-progress-card {
+  background: var(--surface); border-radius: var(--r); padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+}
+.route-progress-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px; }
+.route-progress-label { font-size: 14px; font-weight: 700; }
+.route-progress-pct { font-size: 14px; font-weight: 700; color: var(--accent); }
+.progress-track { height: 8px; background: var(--border); border-radius: var(--r-full); overflow: hidden; }
+.progress-fill { height: 100%; border-radius: var(--r-full); background: var(--accent); transition: width 0.5s; }
+.progress-sub { display: flex; justify-content: space-between; margin-top: 8px; font-size: 12px; color: var(--text-muted); }
+
+/* ── STOP LIST ── */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px;
+}
+.section-title { font-size: 14px; font-weight: 700; }
+.section-count { background: var(--border); border-radius: var(--r-full); padding: 2px 10px; font-size: 12px; font-weight: 600; color: var(--text-muted); }
+
+.stop-list { display: flex; flex-direction: column; }
+
+.stop-item {
+  display: flex; align-items: stretch; gap: 0;
+  position: relative;
+}
+
+.stop-timeline {
+  display: flex; flex-direction: column; align-items: center;
+  width: 32px; flex-shrink: 0; padding-top: 4px;
+}
+.stop-dot {
+  width: 20px; height: 20px; border-radius: 50%;
+  background: var(--border); border: 3px solid white;
+  box-shadow: 0 0 0 2px var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 9px; font-weight: 800; color: white;
+  flex-shrink: 0; z-index: 1;
+}
+.stop-dot.collected { background: var(--success); box-shadow: 0 0 0 2px var(--success); }
+.stop-dot.active { background: var(--accent); box-shadow: 0 0 0 2px var(--accent); animation: pulse-dot 2s infinite; }
+.stop-dot.pending { background: #cbd5e1; }
+@keyframes pulse-dot { 0%,100% { box-shadow: 0 0 0 2px var(--accent); } 50% { box-shadow: 0 0 0 4px rgba(59,130,246,0.3); } }
+.stop-line { width: 2px; flex: 1; background: var(--border); min-height: 12px; }
+.stop-line.done { background: var(--success); }
+
+.stop-card {
+  flex: 1; background: var(--surface); border-radius: var(--r-sm);
+  margin-bottom: 10px; padding: 12px 14px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.05);
+  border-left: 3px solid transparent;
+}
+.stop-card.collected { border-left-color: var(--success); opacity: 0.7; }
+.stop-card.active { border-left-color: var(--accent); }
+.stop-card.pending { border-left-color: var(--border); }
+
+.stop-card-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+.stop-bin-id { font-size: 13px; font-weight: 700; }
+.stop-status-badge {
+  padding: 2px 8px; border-radius: var(--r-full); font-size: 10px; font-weight: 700;
+}
+.stop-name { font-size: 12px; color: var(--text-muted); margin-bottom: 6px; }
+.stop-meta { display: flex; gap: 12px; font-size: 11px; color: var(--text-muted); flex-wrap: wrap; }
+.stop-meta-item { display: flex; align-items: center; gap: 4px; }
+
+.map-link-btn {
+  background: var(--accent-light); color: var(--accent); border: none;
+  border-radius: 8px; padding: 5px 12px; font-size: 11px; font-weight: 700;
+  cursor: pointer; display: flex; align-items: center; gap: 4px;
+  font-family: var(--font); margin-top: 8px; transition: background 0.2s;
+}
+.map-link-btn:hover { background: #bfdbfe; }
+
+/* ── NO COLLECTION NOTICE ── */
+.no-collect-notice {
+  background: #fef3c7; border: 1px solid #fde68a; border-radius: var(--r-sm);
+  padding: 12px 14px; display: flex; align-items: flex-start; gap: 10px;
+  font-size: 12px; color: #92400e;
+}
+.no-collect-notice i { font-size: 18px; flex-shrink: 0; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  background: var(--surface); border-top: 1px solid var(--border);
+  display: flex; padding: 12px 8px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  gap: 4px;
+}
+.bottom-nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 4px; border-radius: 12px; cursor: pointer;
+  color: var(--text-muted); font-size: 10px; font-weight: 600; transition: all 0.2s;
+}
+.bottom-nav-item.active { color: var(--accent); background: var(--accent-light); }
+.bottom-nav-item i { font-size: 22px; }
+
+/* ── TOAST ── */
+#driver-toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--primary); color: white; padding: 12px 20px;
+  border-radius: var(--r-full); font-size: 14px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2); opacity: 0;
+  transition: all 0.3s; pointer-events: none; white-space: nowrap; z-index: 9999;
+}
+#driver-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+</style>
+</head>
+<body>
+
+<div class="phone-wrap">
+  <!-- HEADER -->
+  <div class="driver-header">
+    <div class="driver-header-top">
+      <div class="driver-brand">
+        <div class="driver-brand-icon"><i class="ti ti-truck"></i></div>
+        <div>
+          <div class="driver-brand-name">Envesus</div>
+          <div class="driver-brand-sub">Driver Dashboard</div>
+        </div>
+      </div>
+      <button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left"></i> Switch Role</button>
+    </div>
+
+    <div class="driver-profile">
+      <div class="driver-avatar" id="driver-avatar">SM</div>
+      <div>
+        <div class="driver-name" id="driver-name">Saji Mathew</div>
+        <div class="driver-vehicle" id="driver-vehicle">KL-11-BC-5521 · Truck Alpha</div>
+      </div>
+      <div class="driver-badge" id="driver-status-badge">On Duty</div>
+    </div>
+
+    <!-- ROUTE TABS -->
+    <div class="route-tabs" id="route-tabs"></div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="driver-content">
+
+    <!-- NO COLLECTION NOTICE -->
+    <div class="no-collect-notice">
+      <i class="ti ti-lock"></i>
+      <div><b>View only.</b> Collection confirmation is done by assigned Collection Staff. Your role is to drive the route and assist loading.</div>
+    </div>
+
+    <!-- MAP -->
+    <div class="driver-map-card">
+      <div class="driver-map-header">
+        <div class="driver-map-title"><i class="ti ti-map-route" style="color:var(--accent)"></i> Route Map</div>
+        <div class="demo-badge">Estimated Route</div>
+      </div>
+      <div id="driver-map"></div>
+    </div>
+
+    <!-- ROUTE INFO -->
+    <div class="route-info-row">
+      <div class="route-info-card">
+        <div class="route-info-val" id="drv-total">—</div>
+        <div class="route-info-label">Total Stops</div>
+      </div>
+      <div class="route-info-card">
+        <div class="route-info-val" id="drv-dist" style="color:var(--accent)">—</div>
+        <div class="route-info-label">Est. Distance</div>
+      </div>
+      <div class="route-info-card">
+        <div class="route-info-val" id="drv-time" style="color:var(--warning)">—</div>
+        <div class="route-info-label">Est. Time</div>
+      </div>
+    </div>
+
+    <!-- PROGRESS -->
+    <div class="route-progress-card">
+      <div class="route-progress-header">
+        <div class="route-progress-label">Collection Progress</div>
+        <div class="route-progress-pct" id="drv-pct">0%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="drv-progress-bar" style="width:0%"></div>
+      </div>
+      <div class="progress-sub">
+        <span id="drv-sub-left">— collected</span>
+        <span id="drv-sub-right">— remaining</span>
+      </div>
+    </div>
+
+    <!-- STOPS LIST -->
+    <div>
+      <div class="section-header">
+        <div class="section-title">Collection Stops</div>
+        <div class="section-count" id="drv-stop-count">—</div>
+      </div>
+      <div class="stop-list" id="stop-list"></div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-item active" onclick="setNav(this, 'route')">
+      <i class="ti ti-route"></i>
+      <span>Route</span>
+    </div>
+    <div class="bottom-nav-item" onclick="setNav(this, 'map-tab')">
+      <i class="ti ti-map"></i>
+      <span>Map</span>
+    </div>
+    <div class="bottom-nav-item" onclick="setNav(this, 'info')">
+      <i class="ti ti-info-circle"></i>
+      <span>Info</span>
+    </div>
+  </nav>
+</div>
+
+<div id="driver-toast"></div>
+
+<script src="state.js"></script>
+<script>
+AppState.init();
+
+let driverMap = null;
+let driverMapInit = false;
+let currentRouteId = null;
+
+// ── Get driver data ──────────────────────────────────
+function getCurrentDriver() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramId = urlParams.get('driver');
+  if (paramId && DRIVERS.some(d => d.id === paramId)) {
+    return DRIVERS.find(d => d.id === paramId);
+  }
+  const id = AppState.get('currentDriverId');
+  return DRIVERS.find(d => d.id === id) || DRIVERS[0];
+}
+
+function getCurrentRoutes() {
+  const driver = getCurrentDriver();
+  return AppState.getDriverRoutes(driver.id);
+}
+
+// ── Render ───────────────────────────────────────────
+function renderDriverDashboard() {
+  const driver = getCurrentDriver();
+  document.getElementById('driver-avatar').textContent = driver.avatar;
+  document.getElementById('driver-name').textContent = driver.name;
+  document.getElementById('driver-vehicle').textContent = `${driver.vehicle} · ${driver.vehicleName}`;
+
+  const routes = getCurrentRoutes();
+  if (!routes.length) {
+    document.getElementById('stop-list').innerHTML = '<div style="text-align:center;padding:32px;color:var(--text-muted)">No routes assigned</div>';
+    return;
+  }
+
+  if (!currentRouteId || !routes.some(r => r.id === currentRouteId)) {
+    currentRouteId = routes[0].id;
+  }
+
+  // Route tabs
+  const tabsEl = document.getElementById('route-tabs');
+  tabsEl.innerHTML = routes.map((r, i) =>
+    `<button class="route-tab${currentRouteId === r.id ? ' active' : ''}"
+      onclick="selectRoute('${r.id}', this)">${r.id} — ${r.zone.split('—').pop().trim().split(' ').slice(0,2).join(' ')}</button>`
+  ).join('');
+
+  renderRoute(currentRouteId);
+}
+
+function selectRoute(routeId, tabEl) {
+  currentRouteId = routeId;
+  document.querySelectorAll('.route-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  renderRoute(routeId);
+}
+
+function renderRoute(routeId) {
+  const route = AppState.getRoute(routeId);
+  if (!route) return;
+
+  const bins = AppState.getBinsForRoute(routeId);
+  const progress = AppState.getRouteProgress(routeId);
+
+  document.getElementById('drv-total').textContent = bins.length;
+  document.getElementById('drv-dist').textContent = estimateDistance(bins);
+  document.getElementById('drv-time').textContent = estimateDuration(bins);
+  document.getElementById('drv-pct').textContent = progress.pct + '%';
+  document.getElementById('drv-progress-bar').style.width = progress.pct + '%';
+  document.getElementById('drv-sub-left').textContent = `${progress.done} collected`;
+  document.getElementById('drv-sub-right').textContent = `${progress.remaining} remaining`;
+  document.getElementById('drv-stop-count').textContent = bins.length;
+
+  // Stops
+  const stopList = document.getElementById('stop-list');
+  stopList.innerHTML = bins.map((bin, idx) => {
+    const isLastPending = !bin.collected && (idx === 0 || bins.slice(0, idx).every(b => b.collected));
+    const state = bin.collected ? 'collected' : isLastPending ? 'active' : 'pending';
+    const dotClass = state;
+    const lineClass = bin.collected ? 'done' : '';
+    const statusLabel = bin.collected ? '✓ Collected' : isLastPending ? 'Current Stop' : 'Pending';
+    const statusBg = bin.collected ? 'background:#d1fae5;color:#065f46' : isLastPending ? 'background:#dbeafe;color:#1e40af' : 'background:#f3f4f6;color:#6b7280';
+    const fillColor = getFillHex(bin.fill);
+
+    return `
+    <div class="stop-item">
+      <div class="stop-timeline">
+        <div class="stop-dot ${dotClass}">${idx + 1}</div>
+        ${idx < bins.length - 1 ? `<div class="stop-line ${lineClass}"></div>` : ''}
+      </div>
+      <div class="stop-card ${state}">
+        <div class="stop-card-top">
+          <div class="stop-bin-id">${bin.id}</div>
+          <span class="stop-status-badge" style="${statusBg}">${statusLabel}</span>
+        </div>
+        <div class="stop-name">${bin.name}</div>
+        <div class="stop-meta">
+          <div class="stop-meta-item"><i class="ti ti-chart-bar" style="color:${fillColor}"></i> ${bin.fill}%</div>
+          <div class="stop-meta-item"><i class="ti ti-category"></i> ${bin.type}</div>
+          <div class="stop-meta-item"><i class="ti ti-clock"></i> ${bin.collected ? '✓ ' + (bin.collectedAt || 'Done') : bin.time}</div>
+        </div>
+        ${!bin.collected ? `<button class="map-link-btn" onclick="openInMaps(${bin.lat}, ${bin.lng}, '${bin.id}')">
+          <i class="ti ti-external-link"></i> Open in Maps
+        </button>` : ''}
+      </div>
+    </div>`;
+  }).join('');
+
+  // Update map
+  if (driverMap) updateDriverMap(bins, route.color);
+}
+
+// ── Map ──────────────────────────────────────────────
+function initDriverMap() {
+  if (driverMap) return;
+  const routes = getCurrentRoutes();
+  let allBins = [];
+  if (currentRouteId) {
+    allBins = AppState.getBinsForRoute(currentRouteId);
+  } else if (routes.length) {
+    allBins = AppState.getBinsForRoute(routes[0].id);
+  }
+
+  const center = allBins.length
+    ? [allBins.reduce((s,b)=>s+b.lat,0)/allBins.length, allBins.reduce((s,b)=>s+b.lng,0)/allBins.length]
+    : [11.2550, 75.7750];
+
+  driverMap = L.map('driver-map').setView(center, 16);
+  L.tileLayer(getCartoTileUrl(), { attribution: '© CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(driverMap);
+
+  if (allBins.length) {
+    const route = currentRouteId ? AppState.getRoute(currentRouteId) : routes[0];
+    updateDriverMap(allBins, route ? route.color : '#3b82f6');
+  }
+  driverMapInit = true;
+}
+
+let driverMapLayers = [];
+function updateDriverMap(bins, routeColor) {
+  if (!driverMap) return;
+  driverMapLayers.forEach(l => l.remove());
+  driverMapLayers = [];
+
+  // Route polyline
+  if (bins.length >= 2) {
+    const line = L.polyline(bins.map(b => [b.lat, b.lng]), {
+      color: routeColor || '#3b82f6', weight: 3, opacity: 0.7, dashArray: '6, 8'
+    }).addTo(driverMap);
+    driverMapLayers.push(line);
+  }
+
+  // Markers
+  bins.forEach((bin, idx) => {
+    const color = bin.collected ? '#9ca3af' : getFillHex(bin.fill);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:28px;height:28px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:800;">${bin.collected ? '✓' : (idx + 1)}</div>`,
+      iconSize: [28, 28], iconAnchor: [14, 14],
+    });
+    const m = L.marker([bin.lat, bin.lng], { icon }).addTo(driverMap)
+      .bindPopup(`<b>Stop ${idx+1}: ${bin.id}</b><br>${bin.name}<br>Fill: ${bin.fill}%${bin.collected ? '<br>✓ Collected' : ''}`);
+    driverMapLayers.push(m);
+  });
+
+  // Fit bounds
+  if (bins.length) {
+    try { driverMap.fitBounds(bins.map(b => [b.lat, b.lng]), { padding: [20, 20] }); } catch (e) {}
+  }
+}
+
+function openInMaps(lat, lng, id) {
+  window.open(`https://www.google.com/maps/search/?api=1&query=${lat},${lng}`, '_blank');
+  showToast('Opening ' + id + ' in Maps');
+}
+
+// ── Nav ──────────────────────────────────────────────
+function setNav(el, tab) {
+  document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  if (tab === 'map-tab') {
+    initDriverMap();
+    setTimeout(() => { if (driverMap) driverMap.invalidateSize(); }, 200);
+  }
+}
+
+function goBack() { window.location.href = 'index.html#role-selector'; }
+
+function showToast(msg) {
+  const t = document.getElementById('driver-toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Subscribe to state changes ───────────────────────
+AppState.subscribe(() => {
+  if (currentRouteId) renderRoute(currentRouteId);
+  else renderDriverDashboard();
+});
+
+// ── Init ─────────────────────────────────────────────
+renderDriverDashboard();
+// Init map after small delay
+setTimeout(initDriverMap, 300);
+</script>
+</body>
+</html>

@@ -1,93 +1,122 @@
-// ═══ CONFIG ═══
-const CARTO_API_KEY = 'cb1_4uvs_1_f0e4596920d16f3e3e84916b'; // <-- Paste your CARTO API Key here
+// ═══════════════════════════════════════════════════════
+// ENVESUS ADMIN DASHBOARD — dashboard.js
+// Reads from AppState (state.js must be loaded first)
+// ═══════════════════════════════════════════════════════
 
-// ═══ DATA ═══
-const BINS = [
-  { id: 'CB-001', name: 'Beach Promenade #1', zone: 'Beach — Main Front Footpath', lat: 11.250885, lng: 75.7714416, fill: 37, type: 'Plastic', temp: 29, odor: 22, bat: 83, time: '2h ago', cam: 'CAM-01' },
-  { id: 'CB-002', name: 'Beach Promenade #2', zone: 'Beach — Main Front Footpath', lat: 11.25126, lng: 75.771228, fill: 54, type: 'Mixed', temp: 30, odor: 29, bat: 96, time: '3h ago', cam: 'CAM-02' },
-  { id: 'CB-003', name: 'Beach Promenade #3', zone: 'Beach — Main Front Footpath', lat: 11.251116, lng: 75.771277, fill: 74, type: 'Dry', temp: 32, odor: 48, bat: 81, time: '4h ago', cam: 'CAM-03' },
-  { id: 'CB-004', name: 'Beach Promenade #4', zone: 'Beach — Main Front Footpath', lat: 11.25093, lng: 75.771349, fill: 48, type: 'Plastic', temp: 28, odor: 18, bat: 94, time: '5h ago', cam: 'CAM-04' },
-  { id: 'CB-005', name: 'Beach Promenade #5', zone: 'Beach — Main Front Footpath', lat: 11.251356, lng: 75.7712031, fill: 25, type: 'Plastic', temp: 29, odor: 25, bat: 79, time: '6h ago', cam: 'CAM-05' },
-  { id: 'CB-006', name: 'Beach Promenade #6', zone: 'Beach — Main Front Footpath', lat: 11.251782, lng: 75.7710573, fill: 42, type: 'Mixed', temp: 30, odor: 32, bat: 92, time: '45m ago', cam: 'CAM-06' },
-  { id: 'CB-007', name: 'Beach Promenade #7', zone: 'Beach — Main Front Footpath', lat: 11.252208, lng: 75.7709114, fill: 59, type: 'Dry', temp: 31, odor: 39, bat: 77, time: '2h ago', cam: 'CAM-07' },
-  { id: 'CB-008', name: 'Beach Promenade #8', zone: 'Beach — Main Front Footpath', lat: 11.252634, lng: 75.7707655, fill: 95, type: 'Plastic', temp: 37, odor: 83, bat: 90, time: '3h ago', cam: 'CAM-08' },
-  { id: 'CB-009', name: 'Beach Promenade #9', zone: 'Beach — Main Front Footpath', lat: 11.253060, lng: 75.7706197, fill: 53, type: 'Plastic', temp: 29, odor: 28, bat: 75, time: '4h ago', cam: 'CAM-09' },
-  { id: 'CB-010', name: 'Beach Promenade #10', zone: 'Beach — Main Front Footpath', lat: 11.253486, lng: 75.7704738, fill: 30, type: 'Mixed', temp: 30, odor: 35, bat: 88, time: '5h ago', cam: 'CAM-10' },
-  { id: 'CB-011', name: 'Beach Promenade #11', zone: 'Beach — Main Front Footpath', lat: 11.253912, lng: 75.770328, fill: 68, type: 'Dry', temp: 34, odor: 56, bat: 73, time: '6h ago', cam: 'CAM-11' },
-  { id: 'CB-012', name: 'Beach Promenade #12', zone: 'Beach — Main Front Footpath', lat: 11.254338, lng: 75.7701821, fill: 24, type: 'Plastic', temp: 28, odor: 24, bat: 86, time: '45m ago', cam: 'CAM-12' },
-  { id: 'CB-013', name: 'Private Bus Stand #1', zone: 'Private Bus Stand', lat: 11.2584107, lng: 75.7868887, fill: 41, type: 'Mixed', temp: 29, odor: 31, bat: 71, time: '2h ago', cam: 'CAM-13' },
-  { id: 'CB-014', name: 'Private Bus Stand #2', zone: 'Private Bus Stand', lat: 11.2584826, lng: 75.7870353, fill: 88, type: 'Dry', temp: 37, odor: 89, bat: 84, time: '3h ago', cam: 'CAM-14' },
-  { id: 'CB-015', name: 'Private Bus Stand #3', zone: 'Private Bus Stand', lat: 11.2585634, lng: 75.7869162, fill: 35, type: 'Organic', temp: 31, odor: 20, bat: 97, time: '4h ago', cam: 'CAM-15' },
-  { id: 'CB-016', name: 'Private Bus Stand #4', zone: 'Private Bus Stand', lat: 11.2586353, lng: 75.7870261, fill: 52, type: 'Mixed', temp: 28, odor: 27, bat: 82, time: '5h ago', cam: 'CAM-16' },
-  { id: 'CB-017', name: 'Private Bus Stand #5', zone: 'Private Bus Stand', lat: 11.2589522, lng: 75.7874917, fill: 29, type: 'Mixed', temp: 29, odor: 34, bat: 95, time: '6h ago', cam: 'CAM-17' },
-  { id: 'CB-018', name: 'Private Bus Stand #6', zone: 'Private Bus Stand', lat: 11.2590241, lng: 75.7876383, fill: 46, type: 'Dry', temp: 30, odor: 16, bat: 80, time: '45m ago', cam: 'CAM-18' },
-  { id: 'CB-019', name: 'Private Bus Stand #7', zone: 'Private Bus Stand', lat: 11.2591049, lng: 75.7875192, fill: 76, type: 'Organic', temp: 33, odor: 49, bat: 93, time: '2h ago', cam: 'CAM-19' },
-  { id: 'CB-020', name: 'Private Bus Stand #8', zone: 'Private Bus Stand', lat: 11.2591768, lng: 75.7876291, fill: 40, type: 'Mixed', temp: 28, odor: 30, bat: 78, time: '3h ago', cam: 'CAM-20' },
-  { id: 'CB-021', name: 'Private Bus Stand #9', zone: 'Private Bus Stand', lat: 11.2582392, lng: 75.7863767, fill: 57, type: 'Mixed', temp: 29, odor: 37, bat: 91, time: '4h ago', cam: 'CAM-20' },
-  { id: 'CB-022', name: 'Private Bus Stand #10', zone: 'Private Bus Stand', lat: 11.2583111, lng: 75.7865233, fill: 34, type: 'Dry', temp: 30, odor: 19, bat: 76, time: '5h ago', cam: 'CAM-20' },
-  { id: 'CB-023', name: 'Private Bus Stand #11', zone: 'Private Bus Stand', lat: 11.2583919, lng: 75.7864042, fill: 51, type: 'Organic', temp: 31, odor: 26, bat: 89, time: '6h ago', cam: 'CAM-20' },
-  { id: 'CB-024', name: 'Private Bus Stand #12', zone: 'Private Bus Stand', lat: 11.2584638, lng: 75.7865141, fill: 28, type: 'Mixed', temp: 28, odor: 33, bat: 74, time: '45m ago', cam: 'CAM-20' },
-  { id: 'CB-025', name: 'Starbucks Beach Walk #1', zone: 'Beach — Back of Starbucks', lat: 11.2485781, lng: 75.7723073, fill: 45, type: 'Dry', temp: 29, odor: 15, bat: 87, time: '2h ago', cam: 'CAM-20' },
-  { id: 'CB-026', name: 'Starbucks Beach Walk #2', zone: 'Beach — Back of Starbucks', lat: 11.2490561, lng: 75.7721262, fill: 22, type: 'Plastic', temp: 30, odor: 22, bat: 72, time: '3h ago', cam: 'CAM-20' },
-  { id: 'CB-027', name: 'Starbucks Beach Walk #3', zone: 'Beach — Back of Starbucks', lat: 11.249534, lng: 75.7719452, fill: 82, type: 'Mixed', temp: 35, odor: 87, bat: 85, time: '4h ago', cam: 'CAM-20' },
-  { id: 'CB-028', name: 'Starbucks Beach Walk #4', zone: 'Beach — Back of Starbucks', lat: 11.250012, lng: 75.7717641, fill: 56, type: 'Dry', temp: 28, odor: 36, bat: 70, time: '5h ago', cam: 'CAM-20' },
-  { id: 'CB-029', name: 'Starbucks Beach Walk #5', zone: 'Beach — Back of Starbucks', lat: 11.250393, lng: 75.7716792, fill: 33, type: 'Dry', temp: 29, odor: 18, bat: 83, time: '6h ago', cam: 'CAM-20' },
-  { id: 'CB-030', name: 'Starbucks Beach Walk #6', zone: 'Beach — Back of Starbucks', lat: 11.250296, lng: 75.7717754, fill: 62, type: 'Plastic', temp: 32, odor: 45, bat: 96, time: '45m ago', cam: 'CAM-20' },
-  { id: 'CB-031', name: 'Starbucks Beach Walk #7', zone: 'Beach — Back of Starbucks', lat: 11.250199, lng: 75.7718717, fill: 27, type: 'Mixed', temp: 31, odor: 32, bat: 81, time: '2h ago', cam: 'CAM-20' },
-  { id: 'CB-032', name: 'Starbucks Beach Walk #8', zone: 'Beach — Back of Starbucks', lat: 11.250102, lng: 75.7719679, fill: 44, type: 'Dry', temp: 28, odor: 39, bat: 94, time: '3h ago', cam: 'CAM-20' },
-  { id: 'CB-033', name: 'Beach Food Kiosk #1', zone: 'Beach — Food Kiosk Area', lat: 11.256659, lng: 75.769689, fill: 21, type: 'Organic', temp: 29, odor: 21, bat: 79, time: '4h ago', cam: 'CAM-20' },
-  { id: 'CB-034', name: 'Beach Food Kiosk #2', zone: 'Beach — Food Kiosk Area', lat: 11.256396, lng: 75.769764, fill: 38, type: 'Mixed', temp: 30, odor: 28, bat: 92, time: '5h ago', cam: 'CAM-20' },
-  { id: 'CB-035', name: 'Beach Food Kiosk #3', zone: 'Beach — Food Kiosk Area', lat: 11.256134, lng: 75.769839, fill: 91, type: 'Organic', temp: 37, odor: 80, bat: 77, time: '6h ago', cam: 'CAM-20' },
-  { id: 'CB-036', name: 'Beach Food Kiosk #4', zone: 'Beach — Food Kiosk Area', lat: 11.255871, lng: 75.769914, fill: 32, type: 'Plastic', temp: 28, odor: 17, bat: 90, time: '45m ago', cam: 'CAM-20' },
-  { id: 'CB-037', name: 'Beach Food Kiosk #5', zone: 'Beach — Food Kiosk Area', lat: 11.255609, lng: 75.76999, fill: 49, type: 'Organic', temp: 29, odor: 24, bat: 75, time: '2h ago', cam: 'CAM-20' },
-  { id: 'CB-038', name: 'Beach Food Kiosk #6', zone: 'Beach — Food Kiosk Area', lat: 11.255346, lng: 75.770065, fill: 26, type: 'Mixed', temp: 30, odor: 31, bat: 88, time: '3h ago', cam: 'CAM-20' },
-  { id: 'CB-039', name: 'Beach Food Kiosk #7', zone: 'Beach — Food Kiosk Area', lat: 11.255084, lng: 75.77014, fill: 43, type: 'Organic', temp: 31, odor: 38, bat: 73, time: '4h ago', cam: 'CAM-20' },
-  { id: 'CB-040', name: 'Beach Food Kiosk #8', zone: 'Beach — Food Kiosk Area', lat: 11.254821, lng: 75.770215, fill: 71, type: 'Plastic', temp: 33, odor: 55, bat: 86, time: '5h ago', cam: 'CAM-20' },
-  { id: 'CB-041', name: 'KSRTC Terminal #1', zone: 'KSRTC Terminal', lat: 11.2594302, lng: 75.7821496, fill: 37, type: 'Mixed', temp: 29, odor: 27, bat: 71, time: '6h ago', cam: 'CAM-20' },
-  { id: 'CB-042', name: 'KSRTC Terminal #2', zone: 'KSRTC Terminal', lat: 11.2594547, lng: 75.7823698, fill: 54, type: 'Plastic', temp: 30, odor: 34, bat: 84, time: '45m ago', cam: 'CAM-20' },
-  { id: 'CB-043', name: 'KSRTC Terminal #3', zone: 'KSRTC Terminal', lat: 11.2594804, lng: 75.7826003, fill: 85, type: 'Dry', temp: 36, odor: 88, bat: 97, time: '2h ago', cam: 'CAM-20' },
-  { id: 'CB-044', name: 'KSRTC Terminal #4', zone: 'KSRTC Terminal', lat: 11.2595049, lng: 75.7828205, fill: 48, type: 'Mixed', temp: 28, odor: 23, bat: 82, time: '3h ago', cam: 'CAM-20' },
-  { id: 'CB-045', name: 'KSRTC Terminal #5', zone: 'KSRTC Terminal', lat: 11.2592663, lng: 75.7821802, fill: 25, type: 'Mixed', temp: 29, odor: 30, bat: 95, time: '4h ago', cam: 'CAM-20' },
-  { id: 'CB-046', name: 'KSRTC Terminal #6', zone: 'KSRTC Terminal', lat: 11.2592885, lng: 75.7823987, fill: 42, type: 'Plastic', temp: 30, odor: 37, bat: 80, time: '5h ago', cam: 'CAM-20' },
-  { id: 'CB-047', name: 'KSRTC Terminal #7', zone: 'KSRTC Terminal', lat: 11.2593117, lng: 75.7826275, fill: 65, type: 'Dry', temp: 34, odor: 47, bat: 93, time: '6h ago', cam: 'CAM-20' },
-  { id: 'CB-048', name: 'KSRTC Terminal #8', zone: 'KSRTC Terminal', lat: 11.2593339, lng: 75.782846, fill: 36, type: 'Mixed', temp: 28, odor: 26, bat: 78, time: '45m ago', cam: 'CAM-20' },
-  { id: 'CB-049', name: 'Mananchira Square #1', zone: 'Mananchira Square', lat: 11.255512, lng: 75.779431, fill: 53, type: 'Organic', temp: 29, odor: 33, bat: 91, time: '2h ago', cam: 'CAM-20' },
-  { id: 'CB-050', name: 'Mananchira Square #2', zone: 'Mananchira Square', lat: 11.255594, lng: 75.780143, fill: 30, type: 'Mixed', temp: 30, odor: 15, bat: 76, time: '3h ago', cam: 'CAM-20' },
-  { id: 'CB-051', name: 'Mananchira Square #3', zone: 'Mananchira Square', lat: 11.255391, lng: 75.780633, fill: 47, type: 'Plastic', temp: 31, odor: 22, bat: 89, time: '4h ago', cam: 'CAM-20' },
-  { id: 'CB-052', name: 'Mananchira Square #4', zone: 'Mananchira Square', lat: 11.25485, lng: 75.78135, fill: 89, type: 'Dry', temp: 36, odor: 82, bat: 74, time: '5h ago', cam: 'CAM-20' },
-  { id: 'CB-053', name: 'Mananchira Square #5', zone: 'Mananchira Square', lat: 11.253736, lng: 75.782029, fill: 41, type: 'Organic', temp: 29, odor: 36, bat: 87, time: '6h ago', cam: 'CAM-20' },
-  { id: 'CB-054', name: 'Mananchira Square #6', zone: 'Mananchira Square', lat: 11.253822, lng: 75.779524, fill: 58, type: 'Mixed', temp: 30, odor: 18, bat: 72, time: '45m ago', cam: 'CAM-20' },
-  { id: 'CB-055', name: 'Mananchira Square #7', zone: 'Mananchira Square', lat: 11.253952, lng: 75.780748, fill: 35, type: 'Plastic', temp: 31, odor: 25, bat: 85, time: '2h ago', cam: 'CAM-20' },
-  { id: 'CB-056', name: 'Open Theatre Beach #1', zone: 'Beach — Open Theatre Area', lat: 11.2584112, lng: 75.7688667, fill: 52, type: 'Plastic', temp: 28, odor: 32, bat: 70, time: '3h ago', cam: 'CAM-20' },
-  { id: 'CB-057', name: 'Open Theatre Beach #2', zone: 'Beach — Open Theatre Area', lat: 11.2584471, lng: 75.7690224, fill: 29, type: 'Mixed', temp: 29, odor: 39, bat: 83, time: '4h ago', cam: 'CAM-20' },
-  { id: 'CB-058', name: 'Open Theatre Beach #3', zone: 'Beach — Open Theatre Area', lat: 11.258519, lng: 75.7688301, fill: 70, type: 'Dry', temp: 33, odor: 58, bat: 96, time: '5h ago', cam: 'CAM-20' },
-  { id: 'CB-059', name: 'Open Theatre Beach #4', zone: 'Beach — Open Theatre Area', lat: 11.2585639, lng: 75.768995, fill: 23, type: 'Organic', temp: 31, odor: 28, bat: 81, time: '6h ago', cam: 'CAM-20' },
-  { id: 'CB-060', name: 'Open Theatre Beach #5', zone: 'Beach — Open Theatre Area', lat: 11.2586088, lng: 75.7689217, fill: 40, type: 'Plastic', temp: 28, odor: 35, bat: 94, time: '45m ago', cam: 'CAM-20' },
+// ─── STATE SHORTHAND ──────────────────────────────────
+const BINS   = () => AppState.getBins();
+const ROUTES = () => AppState.getRoutes();
+
+const ALERTS_DATA = [
+  { type: 'critical', title: 'CB-008 Critical Overflow',   desc: 'Beach Promenade #8 reached 95%. High odor detected.',       time: '2m ago'  },
+  { type: 'critical', title: 'CB-035 High Fill Rate',      desc: 'Beach Food Kiosk #3 reached 91%. Fast filling rate.',        time: '15m ago' },
+  { type: 'critical', title: 'CB-052 High Fill Rate',      desc: 'Mananchira Square #4 reached 89%. Filling fast.',            time: '28m ago' },
+  { type: 'warning',  title: 'CB-043 KSRTC Critical',      desc: 'KSRTC Terminal #3 at 85%. Schedule collection.',             time: '31m ago' },
+  { type: 'warning',  title: 'CB-019 Temperature Alert',   desc: 'Private Bus Stand #7 bin temp reading 35°C.',               time: '35m ago' },
+  { type: 'info',     title: 'Route Optimization Complete','desc': '7 routes generated using actual Kozhikode bin coordinates.', time: '1h ago'  },
 ];
 
-const ALERTS = [
-  { type: 'critical', title: 'CB-008 Critical Overflow', desc: 'Beach Promenade #8 reached 95%. High odor detected.', time: '2m ago' },
-  { type: 'critical', title: 'CB-035 High Fill Rate', desc: 'Beach Food Kiosk #3 reached 91%. Fast filling rate.', time: '15m ago' },
-  { type: 'critical', title: 'CB-052 High Fill Rate', desc: 'Mananchira Square #4 reached 89%. Filling fast.', time: '28m ago' },
-  { type: 'warning', title: 'CB-019 Temperature Alert', desc: 'Private Bus Stand #7 bin temp reading 35°C.', time: '35m ago' },
-  { type: 'info', title: 'Route Optimization', desc: 'System generated dynamic road route for 5 critical bins across Beach & Kozhikode Bus Stands.', time: '1h ago' }
-];
+// ─── MAPS ─────────────────────────────────────────────
+let mainMap = null;
+let routeMap = null;
+let routeMapInit = false;
+let chartsInit = false;
+let selectedRouteId = null;
+let routeMapLayers = [];
+let pendingAssignRouteId = null;
 
-const FLEET = [
-  { id: 'KL-11-BC-5521', name: 'Truck Alpha (Beach Sector)', status: 'En Route', progress: 65 },
-  { id: 'KL-11-BC-5522', name: 'Truck Beta (Private Bus Stand)', status: 'Collecting', progress: 40 },
-  { id: 'KL-11-BC-5523', name: 'Truck Gamma (KSRTC & Mananchira)', status: 'Returning', progress: 90 },
-  { id: 'KL-11-BC-5524', name: 'Truck Delta (Standby)', status: 'Idle', progress: 0 }
-];
+// ─── TAB SWITCHING ────────────────────────────────────
+function switchTab(tabId) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.nav-item[id^="nav-"]').forEach(n => n.classList.remove('active'));
+  const tab = document.getElementById('tab-' + tabId);
+  const nav = document.getElementById('nav-' + tabId);
+  if (tab) tab.classList.add('active');
+  if (nav) nav.classList.add('active');
 
-// ═══ UTILS ═══
-function getFillColor(v) { return v >= 80 ? 'var(--critical)' : v >= 50 ? 'var(--warning)' : 'var(--success)'; }
-function getFillHex(v) { return v >= 80 ? '#dc2626' : v >= 50 ? '#d97706' : '#16a34a'; }
-function getBadge(v) { return v >= 80 ? 'badge-critical' : v >= 50 ? 'badge-warning' : 'badge-success'; }
-function getStatus(v) { return v >= 80 ? 'Critical' : v >= 50 ? 'Warning' : 'Normal'; }
+  const titles = {
+    dashboard:  'Overview Dashboard',
+    monitoring: 'Real-Time Bin Status',
+    routes:     'Route Optimization',
+    analytics:  'Data Analytics & Trends',
+    cameras:    'Surveillance Network',
+    alerts:     'Notification Center',
+    fleet:      'Fleet Status',
+    reports:    'Executive Reports',
+  };
+  const el = document.getElementById('page-title');
+  if (el) el.innerText = titles[tabId] || 'Dashboard';
 
+  if (tabId === 'routes') {
+    if (!routeMapInit) setTimeout(initRouteMap, 100);
+    else setTimeout(() => { if (routeMap) routeMap.invalidateSize(); }, 150);
+    renderRoutePanels();
+  }
+  if (tabId === 'dashboard' && mainMap) {
+    setTimeout(() => { if (mainMap) mainMap.invalidateSize(); }, 150);
+  }
+  if (tabId === 'analytics' && !chartsInit) initCharts();
+  if (tabId === 'fleet') renderFleetCards();
+  if (tabId === 'cameras' && !document.querySelector('#cam-grid-container canvas')) initCameras();
+}
+
+function updatePill(el) {
+  document.querySelectorAll('.tab-pill').forEach(p => p.classList.remove('active'));
+  el.classList.add('active');
+}
+function setTimeFilter(el, filter) {
+  updatePill(el);
+  showToast('Showing data for: ' + filter, 'info');
+}
+
+// ─── MODALS ───────────────────────────────────────────
+function openModal(id, binId) {
+  if (binId) {
+    const b = AppState.getBin(binId);
+    if (!b) return;
+    document.getElementById('modal-bin-title').innerHTML = `${b.id} — ${b.name}`;
+    document.getElementById('modal-content').innerHTML = `
+      <div class="grid-2" style="margin-bottom:16px;">
+        <div class="env-card" style="text-align:center;background:var(--bg);padding:16px;border-radius:var(--r-sm);">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;margin-bottom:4px;">Current Fill</div>
+          <div style="font-size:32px;font-weight:800;color:${getFillHex(b.fill)}">${b.fill}%</div>
+          <div class="progress-track" style="margin-top:10px;height:8px;"><div class="progress-fill" style="width:${b.fill}%;background:${getFillHex(b.fill)};"></div></div>
+        </div>
+        <div class="env-card" style="background:var(--bg);padding:16px;border-radius:var(--r-sm);">
+          <div style="font-size:11px;color:var(--text-muted);text-transform:uppercase;font-weight:600;margin-bottom:8px;">Sensors</div>
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:12px;">
+            <div><span class="text-muted">Temp</span><div style="font-weight:700;">${b.temp}°C</div></div>
+            <div><span class="text-muted">Odor</span><div style="font-weight:700;color:${b.odor > 50 ? 'var(--critical)' : 'var(--success)'}">${b.odor} AQI</div></div>
+            <div><span class="text-muted">Battery</span><div style="font-weight:700;color:var(--success)">${b.bat}%</div></div>
+            <div><span class="text-muted">Type</span><div style="font-weight:700">${b.type}</div></div>
+          </div>
+        </div>
+      </div>
+      <div style="background:var(--bg);padding:16px;border-radius:var(--r-sm);font-size:13px;line-height:2;">
+        <span class="text-muted">Zone:</span> <b>${b.zone}</b><br>
+        <span class="text-muted">Coords:</span> <span style="font-family:var(--mono)">${b.lat.toFixed(5)}, ${b.lng.toFixed(5)}</span><br>
+        <span class="text-muted">Last Collected:</span> <b>${b.time}</b>
+        <span class="badge ${getBadgeClass(b.fill)}" style="margin-left:12px">${getStatusLabel(b.fill)}</span>
+        ${b.collected ? `<br><span class="badge badge-success">✓ Collected ${b.collectedAt || ''}</span>` : ''}
+      </div>`;
+  }
+  const overlay = document.getElementById(id);
+  if (overlay) { overlay.style.display = 'flex'; requestAnimationFrame(() => overlay.classList.add('active')); }
+}
+
+function closeModal(id) {
+  const overlay = document.getElementById(id);
+  if (overlay) { overlay.classList.remove('active'); setTimeout(() => { if (!overlay.classList.contains('active')) overlay.style.display = 'none'; }, 250); }
+}
+
+document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => closeModal(m.id)); });
+document.addEventListener('keydown', e => { if ((e.ctrlKey || e.metaKey) && e.key === 'k') { e.preventDefault(); document.getElementById('global-search')?.focus(); } });
+
+// ─── TOAST ────────────────────────────────────────────
 function showToast(msg, type = 'info') {
-  const c = document.getElementById('toast-container'), t = document.createElement('div');
+  const c = document.getElementById('toast-container');
+  if (!c) return;
+  const t = document.createElement('div');
   t.className = `toast ${type}`;
   const icons = { success: 'ti-check', warning: 'ti-alert-triangle', error: 'ti-x', info: 'ti-info-circle' };
   t.innerHTML = `<i class="ti ${icons[type] || icons.info}"></i><span>${msg}</span>`;
@@ -96,363 +125,740 @@ function showToast(msg, type = 'info') {
   setTimeout(() => { t.classList.remove('show'); setTimeout(() => t.remove(), 350); }, 3000);
 }
 
-// ═══ TAB SWITCHING ═══
-function switchTab(tabId) {
-  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
-  document.getElementById('tab-' + tabId).classList.add('active');
-  const nav = document.querySelector(`.nav-item[onclick="switchTab('${tabId}')"]`);
-  if (nav) nav.classList.add('active');
-  const titles = { dashboard: 'Overview Dashboard', monitoring: 'Real-Time Bin Status', routes: 'AI Route Optimization', analytics: 'Data Analytics & Trends', cameras: 'Surveillance Network', alerts: 'Notification Center', fleet: 'Fleet Status', reports: 'Executive Reports & Dashboards' };
-  document.getElementById('page-title').innerText = titles[tabId] || 'Overview Dashboard';
-  if (tabId === 'routes' && !routeMapInit) setTimeout(initRouteMap, 100);
-  if (tabId === 'analytics' && !chartsInit) initCharts();
+// ─── DASHBOARD STATS ──────────────────────────────────
+function updateDashboardStats() {
+  const bins = BINS();
+  const avg = Math.round(bins.reduce((s, b) => s + b.fill, 0) / bins.length);
+  const critical = bins.filter(b => b.fill >= 80).length;
+  const collected = bins.filter(b => b.collected).length;
+
+  const avgEl = document.getElementById('dash-avg-fill');
+  const critEl = document.getElementById('dash-critical');
+  const colEl  = document.getElementById('dash-collected');
+  if (avgEl) avgEl.textContent = avg + '%';
+  if (critEl) critEl.textContent = critical;
+  if (colEl) colEl.textContent = collected;
 }
 
-// ═══ MODALS ═══
-function openModal(id, binId = null) {
-  if (binId) {
-    const b = BINS.find(x => x.id === binId);
-    document.getElementById('modal-bin-title').innerHTML = `${b.id} — ${b.name}`;
-    document.getElementById('modal-content').innerHTML = `
-      <div class="grid-2" style="margin-bottom:16px;">
-        <div class="env-card" style="text-align:center;">
-          <div class="env-label">Current Fill</div>
-          <div class="env-value" style="color:${getFillHex(b.fill)}">${b.fill}%</div>
-          <div class="progress-bar" style="margin-top:10px;height:8px;"><div class="progress-fill" style="width:${b.fill}%;background:${getFillColor(b.fill)};"></div></div>
-        </div>
-        <div class="env-card">
-          <div class="env-label">Sensors</div>
-          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px;font-size:12px;">
-            <div><span class="text-muted">Temp</span><div class="fw-600">${b.temp}°C</div></div>
-            <div><span class="text-muted">Odor</span><div class="fw-600 ${b.odor > 50 ? 'text-critical' : 'text-success'}">${b.odor} AQI</div></div>
-            <div><span class="text-muted">Battery</span><div class="fw-600 text-success">${b.bat}%</div></div>
-            <div><span class="text-muted">Type</span><div class="fw-600">${b.type}</div></div>
-          </div>
-        </div>
+// ─── MAIN MAP ─────────────────────────────────────────
+function initMainMap() {
+  const el = document.getElementById('map');
+  if (!el || mainMap) return;
+
+  mainMap = L.map('map').setView([11.2550, 75.7760], 14);
+  L.tileLayer(getCartoTileUrl(), {
+    attribution: '© <a href="https://carto.com/">CARTO</a>',
+    subdomains: 'abcd', maxZoom: 19,
+  }).addTo(mainMap);
+
+  renderMapMarkers();
+}
+
+function renderMapMarkers() {
+  if (!mainMap) return;
+  BINS().forEach(bin => {
+    const color = bin.collected ? '#9ca3af' : getFillHex(bin.fill);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:30px;height:30px;border-radius:50%;background:${color};border:2.5px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:800;">${bin.collected ? '✓' : bin.fill + '%'}</div>`,
+      iconSize: [30, 30], iconAnchor: [15, 15],
+    });
+    L.marker([bin.lat, bin.lng], { icon })
+      .addTo(mainMap)
+      .bindPopup(`<b>${bin.id}</b><br>${bin.name}<br>Fill: ${bin.fill}%<br>Zone: ${bin.zone}${bin.collected ? '<br>✓ Collected' : ''}`)
+      .on('click', () => openModal('bin-modal', bin.id));
+  });
+}
+
+// ─── FILL LEVEL MATRIX ────────────────────────────────
+function renderMiniBinGrid() {
+  const container = document.getElementById('mini-bin-grid');
+  if (!container) return;
+  container.innerHTML = BINS().map(bin => {
+    const pct = bin.fill;
+    const color = getFillHex(pct);
+    return `<div class="bar-item-wrapper">
+      <div class="bar-item" onclick="openModal('bin-modal','${bin.id}')" title="${bin.id}: ${pct}%">
+        <div class="bar-item-fill" style="height:${pct}%;background:${color};border-radius:6px;"></div>
       </div>
-      <div class="env-card" style="font-size:13px;line-height:2;">
-        <span class="text-muted">Zone:</span> <b>${b.zone}</b><br>
-        <span class="text-muted">Coords:</span> <span class="font-mono">${b.lat.toFixed(4)}, ${b.lng.toFixed(4)}</span><br>
-        <span class="text-muted">Last Collected:</span> <b>${b.time}</b>
-        <span class="badge ${getBadge(b.fill)}" style="margin-left:12px">${getStatus(b.fill)}</span>
-      </div>`;
+      <div class="bar-item-label">${bin.id.replace('CB-','')}</div>
+    </div>`;
+  }).join('');
+}
+
+// ─── ALERTS ───────────────────────────────────────────
+function renderAlerts() {
+  const icons = { critical: 'ti-alert-triangle', warning: 'ti-alert-circle', info: 'ti-info-circle' };
+  const colors = { critical: 'var(--critical)', warning: 'var(--warning)', info: 'var(--info)' };
+  const bgs    = { critical: 'var(--critical-bg)', warning: 'var(--warning-bg)', info: 'var(--info-bg)' };
+
+  const html = ALERTS_DATA.map(a => `
+    <div class="item-card" style="background:${bgs[a.type]};border-color:transparent;">
+      <div><i class="ti ${icons[a.type]}" style="color:${colors[a.type]};font-size:20px;margin-right:12px;"></i></div>
+      <div class="item-info">
+        <div class="item-title">${a.title}</div>
+        <div class="item-subtitle">${a.desc}</div>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);white-space:nowrap;margin-left:12px;">${a.time}</div>
+    </div>`).join('');
+
+  const dashList = document.getElementById('dash-alerts-list');
+  const fullList = document.getElementById('full-alerts-list');
+  if (dashList) dashList.innerHTML = html;
+  if (fullList) fullList.innerHTML = html;
+}
+
+// ─── ZONE CHART ───────────────────────────────────────
+function initZoneChart() {
+  const ctx = document.getElementById('zoneChart');
+  if (!ctx) return;
+  const bins = BINS();
+  const zones = Object.keys(ZONES);
+  const avgs = zones.map(z => {
+    const zBins = bins.filter(b => b.zone === z);
+    return zBins.length ? Math.round(zBins.reduce((s, b) => s + b.fill, 0) / zBins.length) : 0;
+  });
+
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: zones.map(z => ZONES[z].label),
+      datasets: [{ data: avgs, backgroundColor: zones.map(z => ZONES[z].color), borderWidth: 3, borderColor: '#fff' }],
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false, cutout: '60%',
+      plugins: {
+        legend: { position: 'bottom', labels: { font: { size: 11, family: "'Plus Jakarta Sans'" }, boxWidth: 12, padding: 12 } },
+      },
+    },
+  });
+}
+
+// ─── BIN TABLE ────────────────────────────────────────
+function renderTable() {
+  const zone    = document.getElementById('filter-zone')?.value || '';
+  const status  = document.getElementById('filter-status')?.value || '';
+  const search  = document.getElementById('global-search')?.value.toLowerCase() || '';
+  const tbody   = document.getElementById('bin-table-body');
+  if (!tbody) return;
+
+  let bins = BINS().filter(b => {
+    if (zone   && b.zone !== zone) return false;
+    if (status === 'critical' && b.fill < 80) return false;
+    if (status === 'warning'  && (b.fill < 50 || b.fill >= 80)) return false;
+    if (status === 'normal'   && b.fill >= 50) return false;
+    if (search && !`${b.id} ${b.name} ${b.zone}`.toLowerCase().includes(search)) return false;
+    return true;
+  });
+
+  tbody.innerHTML = bins.map(b => `
+    <tr onclick="openModal('bin-modal','${b.id}')">
+      <td><span style="font-family:var(--mono);font-weight:700;">${b.id}</span></td>
+      <td><div style="font-weight:600;">${b.name}</div><div style="font-size:12px;color:var(--text-muted);">${b.zone}</div></td>
+      <td>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <div class="progress-track" style="width:80px;height:8px;"><div class="progress-fill" style="width:${b.fill}%;background:${getFillHex(b.fill)};"></div></div>
+          <span style="font-weight:700;color:${getFillHex(b.fill)}">${b.fill}%</span>
+        </div>
+      </td>
+      <td><span class="badge badge-info" style="font-size:11px;">${b.type}</span></td>
+      <td><span style="font-size:12px;">🌡 ${b.temp}°C · 🔋 ${b.bat}%</span></td>
+      <td><span class="badge ${getBadgeClass(b.fill)}">${getStatusLabel(b.fill)}</span></td>
+      <td>${b.collected ? `<span class="badge badge-success">✓ ${b.collectedAt || 'Done'}</span>` : '<span style="color:var(--text-muted);font-size:12px;">Pending</span>'}</td>
+      <td><button class="btn" style="font-size:12px;padding:6px 12px;" onclick="openModal('bin-modal','${b.id}');event.stopPropagation();">View</button></td>
+    </tr>`).join('');
+}
+
+function handleSearch(value) {
+  renderTable();
+}
+
+// ─── ROUTE OPTIMIZATION ───────────────────────────────
+function initRouteMap() {
+  const el = document.getElementById('route-map');
+  if (!el || routeMap) return;
+  routeMap = L.map('route-map').setView([11.2550, 75.7760], 13);
+  L.tileLayer(getCartoTileUrl(), { attribution: '© CARTO', subdomains: 'abcd', maxZoom: 19 }).addTo(routeMap);
+  routeMapInit = true;
+  // Show all bins on the route map initially
+  renderAllRoutesOnMap();
+}
+
+function renderAllRoutesOnMap() {
+  if (!routeMap) return;
+  routeMapLayers.forEach(l => l.remove());
+  routeMapLayers = [];
+
+  const routes = ROUTES();
+  const allBins = AppState.getBins();
+
+  routes.forEach(route => {
+    const bins = AppState.getBinsForRoute(route.id);
+    if (bins.length >= 2) {
+      const line = L.polyline(bins.map(b => [b.lat, b.lng]), {
+        color: route.color, weight: 2.5, opacity: 0.6, dashArray: '6, 8',
+      }).addTo(routeMap);
+      routeMapLayers.push(line);
+    }
+    bins.forEach((bin, idx) => {
+      const color = bin.collected ? '#9ca3af' : route.color;
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:26px;height:26px;border-radius:50%;background:${color};border:2px solid white;box-shadow:0 2px 6px rgba(0,0,0,0.25);display:flex;align-items:center;justify-content:center;color:white;font-size:9px;font-weight:800;">${idx + 1}</div>`,
+        iconSize: [26, 26], iconAnchor: [13, 13],
+      });
+      const m = L.marker([bin.lat, bin.lng], { icon }).addTo(routeMap)
+        .bindPopup(`<b>${bin.id}</b><br>${bin.name}<br>Route: ${route.id}<br>Fill: ${bin.fill}%`);
+      routeMapLayers.push(m);
+    });
+  });
+
+  // Fit all bins
+  const allCoords = allBins.map(b => [b.lat, b.lng]);
+  try { routeMap.fitBounds(allCoords, { padding: [20, 20] }); } catch (e) {}
+}
+
+function renderSingleRouteOnMap(routeId) {
+  if (!routeMap) { initRouteMap(); return; }
+  routeMapLayers.forEach(l => l.remove());
+  routeMapLayers = [];
+
+  const route = AppState.getRoute(routeId);
+  if (!route) return;
+  const bins = AppState.getBinsForRoute(routeId);
+
+  // Route polyline
+  if (bins.length >= 2) {
+    const line = L.polyline(bins.map(b => [b.lat, b.lng]), {
+      color: route.color, weight: 4, opacity: 0.8, dashArray: '8, 10',
+    }).addTo(routeMap);
+    routeMapLayers.push(line);
+
+    // Animated arrowhead effect — number each stop
+    bins.forEach((bin, idx) => {
+      const color = bin.collected ? '#9ca3af' : route.color;
+      const icon = L.divIcon({
+        className: '',
+        html: `<div style="width:32px;height:32px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 3px 10px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:11px;font-weight:800;">${bin.collected ? '✓' : (idx + 1)}</div>`,
+        iconSize: [32, 32], iconAnchor: [16, 16],
+      });
+      const m = L.marker([bin.lat, bin.lng], { icon }).addTo(routeMap)
+        .bindPopup(`<b>Stop ${idx + 1}: ${bin.id}</b><br>${bin.name}<br>Fill: ${bin.fill}%${bin.collected ? '<br>✓ Collected' : ''}`);
+      routeMapLayers.push(m);
+    });
   }
-  document.getElementById(id).classList.add('active');
-}
-function closeModal(id) { document.getElementById(id).classList.remove('active'); }
 
-// ═══ BUTTON HANDLERS ═══
-function triggerExport() { showToast('Generating CSV report...', 'info'); setTimeout(() => showToast('Report downloaded!', 'success'), 1500); }
-function saveSettings() { closeModal('settings-modal'); showToast('Settings saved.', 'success'); }
-function scheduleCollection() { closeModal('bin-modal'); showToast('Pickup prioritized.', 'success'); }
-function dispatchAllRoutes() { showToast('Routes dispatched to GPS units.', 'success'); }
-function downloadFootage() { showToast('Compiling footage logs...', 'info'); setTimeout(() => showToast('Archive (1.2GB) downloading.', 'success'), 2000); }
-function toggleRecording(btn) {
-  if (btn.innerText.includes('REC')) { btn.innerHTML = '<i class="ti ti-player-stop"></i> Stop'; btn.style.background = 'var(--bg)'; btn.style.color = 'var(--text)'; btn.style.borderColor = 'var(--border)'; showToast('Recording enabled.', 'warning'); }
-  else { btn.innerHTML = '<i class="ti ti-player-record"></i> REC All'; btn.style.background = 'var(--critical)'; btn.style.color = '#fff'; btn.style.borderColor = 'var(--critical)'; showToast('Recording stopped.', 'info'); }
+  try { routeMap.fitBounds(bins.map(b => [b.lat, b.lng]), { padding: [30, 30] }); } catch (e) {}
+
+  // Update map label
+  const label = document.getElementById('route-map-label');
+  if (label) label.textContent = `— ${route.label}  ·  ${estimateDistance(bins)}  ·  ${estimateDuration(bins)}`;
+  const assignBtn = document.getElementById('assign-btn');
+  if (assignBtn) assignBtn.style.display = 'inline-flex';
 }
 
-// ═══ RENDERERS ═══
-function renderDashboard() {
-  // Vertical Bars
-  document.getElementById('mini-bin-grid').innerHTML = BINS.map(b => `
-    <div class="bar-item-wrapper" onclick="openModal('bin-modal','${b.id}')" title="${b.name}: ${b.fill}%">
-      <div class="bar-item">
-        <div class="bar-item-fill" style="height:${b.fill}%; background:${getFillColor(b.fill)}"></div>
-      </div>
-      <div class="bar-item-label">${b.id.split('-')[1]}</div>
-    </div>
-  `).join('');
+function renderRoutePanels() {
+  const container = document.getElementById('route-cards-container');
+  if (!container) return;
+  const zoneFilter = document.getElementById('route-filter-zone')?.value || '';
+  const statusFilter = document.getElementById('route-filter-status')?.value || '';
 
-  // Alerts styling updated to match insights theme
-  const html = ALERTS.map(a => {
-    let bg = 'var(--info-bg)';
-    let color = 'var(--info)';
-    let icon = 'ti-info-circle';
-    if (a.type === 'critical') { bg = 'var(--critical-bg)'; color = 'var(--critical)'; icon = 'ti-alert-triangle'; }
-    if (a.type === 'warning') { bg = 'var(--warning-bg)'; color = 'var(--warning)'; icon = 'ti-alert-circle'; }
+  let routes = ROUTES();
+  if (zoneFilter) routes = routes.filter(r => r.zone === zoneFilter);
+  if (statusFilter === 'done') routes = routes.filter(r => AppState.getRouteProgress(r.id).pct === 100);
+  else if (statusFilter === 'progress') routes = routes.filter(r => { const p = AppState.getRouteProgress(r.id); return p.pct > 0 && p.pct < 100; });
+  else if (statusFilter === 'pending') routes = routes.filter(r => AppState.getRouteProgress(r.id).pct === 0);
+
+  const countLabel = document.getElementById('route-count-label');
+  if (countLabel) countLabel.textContent = `Showing ${routes.length} of ${ROUTES().length} routes`;
+
+  if (routes.length === 0) {
+    container.innerHTML = `<div style="text-align:center;padding:40px 20px;color:var(--text-muted);background:var(--surface);border-radius:var(--r);"><i class="ti ti-route-off" style="font-size:32px;display:block;margin-bottom:8px;"></i>No routes match filters</div>`;
+    return;
+  }
+
+  container.innerHTML = routes.map(route => {
+    const bins = AppState.getBinsForRoute(route.id);
+    const progress = AppState.getRouteProgress(route.id);
+    const staff = STAFF_MEMBERS.find(s => s.id === route.staffId);
+    const driver = DRIVERS.find(d => d.id === route.driverId);
+    const isSelected = route.id === selectedRouteId;
 
     return `
-      <div class="item-card" style="align-items:flex-start;background:${bg};border-color:transparent;padding:12px;cursor:pointer;">
-        <i class="ti ${icon}" style="color:${color};font-size:20px;margin-right:10px;"></i>
-        <div style="flex:1;">
-          <div style="font-size:13px;font-weight:700;color:var(--text);margin-bottom:4px;">${a.title}</div>
-          <div style="font-size:12px;color:var(--text);line-height:1.4;">${a.desc}</div>
+    <div class="route-card" style="border-left-color:${route.color};${isSelected ? 'box-shadow:0 0 0 2px ' + route.color + ';' : ''}"
+      onclick="selectRouteOnMap('${route.id}', this)">
+      <div class="route-card-header">
+        <div>
+          <div class="route-card-id">${route.id}</div>
+          <div class="route-card-label">${route.label}</div>
+          <div class="route-card-zone"><i class="ti ti-map-pin" style="font-size:11px;"></i> ${route.zone}</div>
         </div>
-        <div style="font-size:11px;font-weight:600;color:${color};">${a.time}</div>
+        <span class="badge ${progress.pct === 100 ? 'badge-success' : progress.pct > 0 ? 'badge-warning' : 'badge-info'}" style="flex-shrink:0">
+          ${progress.pct === 100 ? '✓ Done' : progress.pct > 0 ? 'In Progress' : 'Pending'}
+        </span>
       </div>
-    `;
+
+      <div class="route-card-meta">
+        <span><i class="ti ti-route"></i> ${bins.length} stops</span>
+        <span><i class="ti ti-ruler"></i> ${estimateDistance(bins)}</span>
+        <span><i class="ti ti-clock"></i> ${estimateDuration(bins)}</span>
+      </div>
+
+      <!-- Progress -->
+      <div style="margin-bottom:10px;">
+        <div style="display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px;">
+          <span style="color:var(--text-muted)">${progress.done}/${progress.total} collected</span>
+          <span style="font-weight:700;color:${route.color}">${progress.pct}%</span>
+        </div>
+        <div class="progress-track" style="height:6px;">
+          <div class="progress-fill" style="width:${progress.pct}%;background:${route.color};"></div>
+        </div>
+      </div>
+
+      <div class="route-card-assignment">
+        <span class="assignment-pill"><i class="ti ti-user"></i> ${staff ? staff.name : '—'}</span>
+        <span class="assignment-pill"><i class="ti ti-truck"></i> ${driver ? driver.vehicleName : '—'}</span>
+      </div>
+
+      <div style="display:flex;gap:8px;">
+        <button class="btn" style="font-size:12px;flex:1;" onclick="openAssignModal('${route.id}');event.stopPropagation();"><i class="ti ti-user-plus"></i> Assign</button>
+        <button class="btn" style="font-size:12px;flex:1;" onclick="reOptimizeRoute('${route.id}');event.stopPropagation();"><i class="ti ti-brain"></i> Re-optimize</button>
+      </div>
+    </div>`;
   }).join('');
-  document.getElementById('dash-alerts-list').innerHTML = html;
-  const fa = document.getElementById('full-alerts-list'); if (fa) fa.innerHTML = html;
-  // Fleet
-  const fl = document.getElementById('fleet-list');
-  if (fl) fl.innerHTML = FLEET.map(f => `<div class="list-item"><div class="list-icon info"><i class="ti ti-truck"></i></div><div class="list-content"><div class="list-title">${f.name} <span class="badge ${f.progress > 0 ? 'badge-success' : 'badge-neutral'}" style="margin-left:8px">${f.status}</span></div><div class="progress-bar" style="margin-top:8px;max-width:300px;"><div class="progress-fill" style="width:${f.progress}%;background:var(--info);"></div></div></div><div class="fw-600" style="color:var(--info)">${f.progress}%</div></div>`).join('');
-  renderTable(); renderCameras();
 }
 
-function renderTable(search = '') {
-  const zone = document.getElementById('filter-zone')?.value;
-  const status = document.getElementById('filter-status')?.value;
-  let f = BINS;
-  if (zone) f = f.filter(b => b.zone === zone);
-  if (status === 'critical') f = f.filter(b => b.fill >= 80);
-  else if (status === 'warning') f = f.filter(b => b.fill >= 50 && b.fill < 80);
-  else if (status === 'normal') f = f.filter(b => b.fill < 50);
-  if (search) { const s = search.toLowerCase(); f = f.filter(b => b.id.toLowerCase().includes(s) || b.name.toLowerCase().includes(s) || b.zone.toLowerCase().includes(s)); }
-  const tb = document.getElementById('bin-table-body'); if (!tb) return;
-  tb.innerHTML = f.map(b => `<tr onclick="openModal('bin-modal','${b.id}')"><td class="font-mono fw-600" style="color:var(--primary)">${b.id}</td><td><div class="fw-600">${b.name}</div><div style="font-size:11px;color:var(--text-muted)">${b.zone}</div></td><td><div class="progress-wrap"><div class="progress-bar" style="width:80px"><div class="progress-fill" style="width:${b.fill}%;background:${getFillColor(b.fill)}"></div></div><span class="progress-text" style="color:${getFillHex(b.fill)}">${b.fill}%</span></div></td><td>${b.type}</td><td><div style="font-size:11px"><i class="ti ti-temperature text-warning"></i> ${b.temp}°C</div><div style="font-size:11px"><i class="ti ti-battery-3 text-success"></i> ${b.bat}%</div></td><td class="text-muted">${b.time}</td><td><span class="badge ${getBadge(b.fill)}">${getStatus(b.fill)}</span></td><td><button class="btn btn-sm" onclick="event.stopPropagation();scheduleCollection()"><i class="ti ti-truck"></i> Pick</button></td></tr>`).join('');
+function selectRouteOnMap(routeId, el) {
+  selectedRouteId = routeId;
+  document.querySelectorAll('.route-card').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  renderSingleRouteOnMap(routeId);
+  pendingAssignRouteId = routeId;
 }
 
-let searchTimeout;
-function handleSearch(v) { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { switchTab('monitoring'); renderTable(v); }, 300); }
+function openAssignModal(routeId) {
+  pendingAssignRouteId = routeId;
+  const route = AppState.getRoute(routeId);
+  if (!route) return;
 
-function renderCameras() {
-  const c = document.getElementById('cam-grid-container'); if (!c) return;
-  c.innerHTML = Array(8).fill(0).map((_, i) => `<div class="cam-feed" onclick="showToast('Camera ${i + 1} fullscreen view','info')"><canvas id="cam-${i}"></canvas><div class="cam-overlay"></div><div style="position:absolute;top:10px;left:12px;color:#fff;font-size:14px"><i class="ti ti-video"></i></div><div class="cam-live">● LIVE</div><div class="cam-label"><div class="cam-name">CAM-0${i + 1} · ${BINS[i].name}</div><div class="cam-status">1080p · 30fps</div></div></div>`).join('');
-  setTimeout(() => { for (let i = 0; i < 8; i++) { const cv = document.getElementById(`cam-${i}`); if (cv) { const ctx = cv.getContext('2d'); cv.width = cv.offsetWidth; cv.height = cv.offsetHeight; ctx.fillStyle = '#0f172a'; ctx.fillRect(0, 0, cv.width, cv.height); ctx.strokeStyle = 'rgba(255,255,255,0.08)'; for (let j = 0; j < cv.width; j += 18) { ctx.beginPath(); ctx.moveTo(j, 0); ctx.lineTo(j, cv.height); ctx.stroke(); } ctx.fillStyle = 'rgba(255,255,255,0.15)'; ctx.fillRect(cv.width / 2 - 20, cv.height / 2, 40, cv.height / 2); } } }, 150);
+  document.getElementById('assign-modal-body').innerHTML = `
+    <div style="margin-bottom:4px;font-size:13px;color:var(--text-muted);">Route: <b>${route.id} — ${route.label}</b></div>
+    <label style="display:block;margin:16px 0 8px;font-size:14px;font-weight:600;">Collection Staff</label>
+    <select class="search-input" style="width:100%;padding:10px 16px;" id="modal-assign-staff">
+      ${STAFF_MEMBERS.map(s => `<option value="${s.id}" ${s.id === route.staffId ? 'selected' : ''}>${s.name} — ${s.zone.split('—').pop().trim()}</option>`).join('')}
+    </select>
+    <label style="display:block;margin:16px 0 8px;font-size:14px;font-weight:600;">Driver</label>
+    <select class="search-input" style="width:100%;padding:10px 16px;" id="modal-assign-driver">
+      ${DRIVERS.map(d => `<option value="${d.id}" ${d.id === route.driverId ? 'selected' : ''}>${d.name} — ${d.vehicleName}</option>`).join('')}
+    </select>`;
+
+  openModal('assign-modal');
 }
 
-// ═══ MAPS ═══
-let mainMap, routeMap, routeMapInit = false;
-
-function getCartoTileUrl(style = 'light_all') {
-  const base = `https://{s}.basemaps.cartocdn.com/${style}/{z}/{x}/{y}{r}.png`;
-  return CARTO_API_KEY ? `${base}?key=${CARTO_API_KEY}` : base;
+function saveRouteAssignment() {
+  const staffId  = document.getElementById('modal-assign-staff')?.value;
+  const driverId = document.getElementById('modal-assign-driver')?.value;
+  if (!pendingAssignRouteId) return;
+  AppState.assignRoute(pendingAssignRouteId, staffId, driverId);
+  closeModal('assign-modal');
+  renderRoutePanels();
+  renderFleetCards();
+  showToast('Route assignment updated', 'success');
 }
 
-function initMainMap() {
-  mainMap = L.map('map', { scrollWheelZoom: false }).setView([11.260, 75.780], 13);
-  L.tileLayer(getCartoTileUrl('light_all'), {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20
-  }).addTo(mainMap);
-  const bounds = L.latLngBounds();
-  BINS.forEach(b => {
-    const col = getFillHex(b.fill);
-    const icon = L.divIcon({ className: '', html: `<div style="width:26px;height:26px;background:${col};border-radius:50%;border:2.5px solid #fff;box-shadow:0 2px 8px rgba(0,0,0,.25);display:flex;align-items:center;justify-content:center;color:#fff;font-size:9px;font-weight:700;">${b.fill}</div>`, iconSize: [26, 26], iconAnchor: [13, 13] });
-    L.marker([b.lat, b.lng], { icon }).addTo(mainMap).bindPopup(`<div style="min-width:170px;font-family:Inter,sans-serif"><div style="font-weight:600;font-size:14px;margin-bottom:2px">${b.name}</div><div style="font-size:11px;color:#64748b;margin-bottom:8px">${b.id} · ${b.zone}</div><div class="badge ${getBadge(b.fill)}" style="margin-bottom:8px">${b.fill}% Full</div><br><button class="btn btn-primary btn-sm" style="width:100%;justify-content:center;margin-top:4px" onclick="openModal('bin-modal','${b.id}')">View Details</button></div>`);
-    bounds.extend([b.lat, b.lng]);
+function reOptimizeRoute(routeId) {
+  const route = AppState.getRoute(routeId);
+  if (!route) return;
+  const bins = AppState.getBinsForZone(route.zone);
+  const ordered = nearestNeighbour(bins);
+  AppState.updateRouteBins(routeId, ordered);
+  renderRoutePanels();
+  if (selectedRouteId === routeId) renderSingleRouteOnMap(routeId);
+  showToast(`${routeId} re-optimized`, 'success');
+}
+
+function optimizeAllRoutes() {
+  ROUTES().forEach(route => {
+    const bins = AppState.getBinsForZone(route.zone);
+    const ordered = nearestNeighbour(bins);
+    AppState.updateRouteBins(route.id, ordered);
   });
-  if (BINS.length > 0) mainMap.fitBounds(bounds, { padding: [30, 30] });
+  renderRoutePanels();
+  renderAllRoutesOnMap();
+  showToast('All 7 routes re-optimized', 'success');
 }
 
-function initRouteMap() {
-  routeMapInit = true;
-  routeMap = L.map('route-map', { scrollWheelZoom: false }).setView([11.260, 75.780], 13);
-  L.tileLayer(getCartoTileUrl('light_all'), {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors &copy; <a href="https://carto.com/attributions">CARTO</a>',
-    subdomains: 'abcd',
-    maxZoom: 20
-  }).addTo(routeMap);
-  const crit = BINS.filter(b => b.fill >= 80).slice(0, 5);
-  if (crit.length < 2) return;
-  crit.forEach((b, i) => { const icon = L.divIcon({ className: '', html: `<div style="width:24px;height:24px;background:var(--primary);border-radius:50%;border:2px solid #fff;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;box-shadow:0 2px 6px rgba(0,0,0,.2)">${i + 1}</div>`, iconSize: [24, 24], iconAnchor: [12, 12] }); L.marker([b.lat, b.lng], { icon }).bindPopup(`Stop ${i + 1}: ${b.name}`).addTo(routeMap); });
-  const coords = crit.map(b => `${b.lng},${b.lat}`).join(';');
-  showToast('Calculating road routes via OSRM...', 'info');
-  fetch(`https://router.project-osrm.org/route/v1/driving/${coords}?overview=full&geometries=geojson`)
-    .then(r => r.json()).then(data => {
-      if (data.code !== 'Ok') throw new Error('OSRM Error');
-      const route = data.routes[0];
-      L.geoJSON(route.geometry, { style: { color: '#0d9488', weight: 5, opacity: .75, dashArray: '10,6' } }).addTo(routeMap);
-      const km = (route.distance / 1000).toFixed(1), mins = Math.round(route.duration / 60);
-      document.getElementById('route-cards-container').innerHTML = `
-        <div class="route-card"><div class="route-color" style="background:var(--critical)"></div><div class="route-details"><div class="route-header"><div class="route-title">Priority Route Alpha</div><span class="badge badge-critical">Dispatch Ready</span></div><div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin:8px 0;font-size:12px"><div><i class="ti ti-ruler-2 text-muted"></i> <b>${km} km</b> (Road)</div><div><i class="ti ti-clock text-muted"></i> <b>~${mins} min</b></div><div><i class="ti ti-map-pin text-muted"></i> <b>${crit.length} Stops</b></div><div><i class="ti ti-truck text-muted"></i> KL-11-BC-5521</div></div><div style="font-size:11px;color:var(--text-muted);border-top:1px solid var(--border);padding-top:8px"><b>Path:</b> ${crit.map(b => b.name.split(' ')[0]).join(' → ')}</div><button class="btn btn-primary btn-sm" style="width:100%;margin-top:10px;justify-content:center" onclick="dispatchAllRoutes()">Dispatch</button></div></div>
-        <div class="route-card" style="opacity:.5"><div class="route-color" style="background:var(--warning)"></div><div class="route-details"><div class="route-header"><div class="route-title">Secondary Route Beta</div><span class="badge badge-warning">Building...</span></div><div style="font-size:12px;margin-top:6px" class="text-muted">Awaiting more bins to hit warning threshold.</div></div></div>`;
-      routeMap.fitBounds(L.latLngBounds(crit.map(b => [b.lat, b.lng])), { padding: [50, 50] });
-    }).catch(() => { showToast('Routing API failed. Using fallback.', 'error'); L.polyline(crit.map(b => [b.lat, b.lng]), { color: '#0d9488', weight: 4, dashArray: '5,5' }).addTo(routeMap); });
+function dispatchAllRoutes() {
+  ROUTES().forEach(r => AppState.setRouteStatus(r.id, 'dispatched'));
+  renderRoutePanels();
+  showToast('All routes dispatched', 'success');
 }
 
-// ═══ CHARTS ═══
-let chartsInit = false;
+// ─── FLEET STATUS ─────────────────────────────────────
+function renderFleetCards() {
+  const container = document.getElementById('fleet-cards-container');
+  if (!container) return;
+
+  const routes = ROUTES();
+  const allDriverRoutes = {};
+  routes.forEach(r => {
+    if (!allDriverRoutes[r.driverId]) allDriverRoutes[r.driverId] = [];
+    allDriverRoutes[r.driverId].push(r);
+  });
+
+  container.innerHTML = DRIVERS.map(driver => {
+    const driverRoutes = allDriverRoutes[driver.id] || [];
+    const progress = driverRoutes.reduce((agg, r) => {
+      const p = AppState.getRouteProgress(r.id);
+      return { done: agg.done + p.done, total: agg.total + p.total };
+    }, { done: 0, total: 0 });
+    const pct = progress.total ? Math.round(progress.done / progress.total * 100) : 0;
+
+    const statusColors = { 0: '#6b7280', 1: '#3b82f6', 100: '#10b981' };
+    const statusLabel = pct === 100 ? 'Complete' : pct > 0 ? 'In Progress' : 'Standby';
+    const iconBg = pct === 100 ? '#d1fae5' : pct > 0 ? '#dbeafe' : '#f3f4f6';
+    const iconColor = pct === 100 ? '#10b981' : pct > 0 ? '#3b82f6' : '#6b7280';
+
+    const assignedRouteIds = driverRoutes.map(r => r.id).join(', ') || '—';
+    const assignedStaff = [...new Set(driverRoutes.map(r => {
+      const s = STAFF_MEMBERS.find(st => st.id === r.staffId);
+      return s ? s.name : '?';
+    }))].join(', ') || '—';
+
+    return `
+    <div class="fleet-card">
+      <div class="fleet-vehicle-icon" style="background:${iconBg};color:${iconColor};">
+        <i class="ti ti-truck" style="font-size:26px;"></i>
+      </div>
+      <div class="fleet-info">
+        <div class="fleet-vehicle-id">${driver.vehicle} — ${driver.vehicleName}</div>
+        <div class="fleet-route-label">Driver: <b>${driver.name}</b></div>
+        <div class="fleet-staff-driver">
+          <span><i class="ti ti-route"></i> ${assignedRouteIds}</span>
+          <span><i class="ti ti-user"></i> ${assignedStaff}</span>
+          <span style="background:${iconBg};color:${iconColor};padding:2px 10px;border-radius:var(--r-full);font-weight:700;font-size:11px;">${statusLabel}</span>
+        </div>
+        <div style="margin-top:6px;font-size:12px;color:var(--text-secondary);display:flex;gap:14px;flex-wrap:wrap;">
+          <span><i class="ti ti-map-pin text-blue"></i> Last location: <b>${driverRoutes.length ? driverRoutes[0].zone.split('—').pop().trim() + ' Depot' : 'Calicut Municipal Yard'}</b></span>
+          <span><i class="ti ti-gas-station text-warning"></i> Operational · Fuel: <b>85%</b></span>
+        </div>
+        <div style="margin-top:6px;font-size:11px;color:var(--text-muted);background:#fef3c7;color:#92400e;display:inline-block;padding:2px 8px;border-radius:var(--r-full);">
+          <i class="ti ti-info-circle"></i> Simulated status — live GPS not connected
+        </div>
+      </div>
+      <div class="fleet-progress-wrap">
+        <div class="fleet-progress-header">
+          <span class="fleet-progress-label">Progress</span>
+          <span class="fleet-progress-pct" style="color:${iconColor}">${pct}%</span>
+        </div>
+        <div class="progress-track">
+          <div class="progress-fill" style="width:${pct}%;background:${iconColor};"></div>
+        </div>
+        <div style="font-size:12px;color:var(--text-muted);margin-top:6px;text-align:right;">
+          ${progress.done}/${progress.total} stops collected
+        </div>
+        <button class="btn" style="width:100%;margin-top:10px;font-size:12px;" onclick="openFleetReassign('${driver.id}')">
+          <i class="ti ti-edit"></i> Reassign
+        </button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function openFleetReassign(driverId) {
+  // Populate fleet assign modal
+  const routeSelect = document.getElementById('fleet-assign-route');
+  const staffSelect = document.getElementById('fleet-assign-staff');
+  const driverSelect = document.getElementById('fleet-assign-driver');
+  if (!routeSelect) return;
+
+  routeSelect.innerHTML = '<option value="">Select route...</option>' +
+    ROUTES().map(r => `<option value="${r.id}">${r.id} — ${r.label}</option>`).join('');
+  staffSelect.innerHTML = STAFF_MEMBERS.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+  driverSelect.innerHTML = DRIVERS.map(d => `<option value="${d.id}" ${d.id === driverId ? 'selected' : ''}>${d.name} — ${d.vehicleName}</option>`).join('');
+
+  openModal('assign-fleet-modal');
+}
+
+function saveFleetAssignment() {
+  const routeId  = document.getElementById('fleet-assign-route')?.value;
+  const staffId  = document.getElementById('fleet-assign-staff')?.value;
+  const driverId = document.getElementById('fleet-assign-driver')?.value;
+  if (!routeId) { showToast('Please select a route', 'warning'); return; }
+  AppState.assignRoute(routeId, staffId, driverId);
+  closeModal('assign-fleet-modal');
+  renderFleetCards();
+  renderRoutePanels();
+  showToast('Fleet assignment updated', 'success');
+}
+
+// ─── ACTIONS ──────────────────────────────────────────
+function scheduleCollection() {
+  closeModal('bin-modal');
+  showToast('Collection scheduled', 'success');
+}
+
+function triggerExport() {
+  const bins = BINS();
+  const rows = [['Bin ID','Zone','Fill %','Type','Temp','Odor','Battery','Collected','Last Collected']];
+  bins.forEach(b => rows.push([b.id, b.zone, b.fill, b.type, b.temp, b.odor, b.bat, b.collected ? 'Yes' : 'No', b.time]));
+  const csv = rows.map(r => r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
+  a.download = `envesus_bins_${new Date().toISOString().split('T')[0]}.csv`;
+  a.click();
+  showToast('CSV export downloaded', 'success');
+}
+
+function saveSettings() {
+  closeModal('settings-modal');
+  showToast('Settings saved', 'success');
+}
+
+function resetDemo() {
+  AppState.reset();
+  closeModal('settings-modal');
+  updateDashboardStats();
+  renderTable();
+  renderRoutePanels();
+  renderFleetCards();
+  showToast('Demo data reset to defaults', 'info');
+}
+
+// ─── CAMERAS ──────────────────────────────────────────
+function initCameras() {
+  const grid = document.getElementById('cam-grid-container');
+  if (!grid) return;
+  const cameras = BINS().slice(0, 8).map((b, i) => ({ id: `CAM-0${i+1}`, bin: b.id, zone: b.zone }));
+  grid.innerHTML = cameras.map(cam => `
+    <div class="cam-feed" onclick="showToast('Opening ${cam.id} fullscreen')">
+      <canvas id="${cam.id}-canvas" width="320" height="180"></canvas>
+      <div class="cam-overlay"></div>
+      <div class="cam-live">● LIVE</div>
+      <div class="cam-label">
+        <div class="cam-name">${cam.id} — ${cam.bin}</div>
+        <div class="cam-status">${cam.zone.split('—').pop().trim()}</div>
+      </div>
+    </div>`).join('');
+
+  cameras.forEach(cam => {
+    const canvas = document.getElementById(cam.id + '-canvas');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let t = 0;
+    const hue = Math.floor(Math.random() * 40 + 150);
+    function draw() {
+      ctx.fillStyle = `hsl(${hue},40%,${Math.floor(10 + Math.sin(t*0.04)*5)}%)`;
+      ctx.fillRect(0, 0, 320, 180);
+      for (let i = 0; i < 12; i++) {
+        ctx.fillStyle = `rgba(255,255,255,${Math.random() * 0.03})`;
+        ctx.fillRect(Math.random()*320, Math.random()*180, Math.random()*60+20, Math.random()*40+10);
+      }
+      ctx.fillStyle = `rgba(255,255,255,${0.03 + Math.sin(t*0.1)*0.02})`;
+      ctx.fillRect(0, t % 180, 320, 1);
+      t++;
+      requestAnimationFrame(draw);
+    }
+    draw();
+  });
+}
+
+function downloadFootage() { showToast('Preparing footage download...', 'info'); }
+function toggleRecording(btn) {
+  const isRec = btn.classList.toggle('recording');
+  btn.innerHTML = isRec ? '<i class="ti ti-player-stop"></i> Stop REC' : '<i class="ti ti-player-record"></i> REC All';
+  showToast(isRec ? 'Recording started' : 'Recording stopped', isRec ? 'success' : 'info');
+}
+
+// ─── ANALYTICS CHARTS ─────────────────────────────────
 function initCharts() {
   chartsInit = true;
-  Chart.defaults.font.family = "'Plus Jakarta Sans',sans-serif";
-  Chart.defaults.color = '#6b7280';
+  const months = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct'];
+  const chartDefaults = { font: { family: "'Plus Jakarta Sans'" }, color: '#6b7280' };
 
-  const zc = document.getElementById('zoneChart');
-  if (zc) {
-    const zoneCounts = {};
-    BINS.forEach(b => { zoneCounts[b.zone] = (zoneCounts[b.zone] || 0) + 1; });
-    const labels = Object.keys(zoneCounts);
-    const data = Object.values(zoneCounts);
-    new Chart(zc, {
-      type: 'doughnut',
-      data: {
-        labels: labels,
-        datasets: [{
-          data: data,
-          backgroundColor: ['#1e3a5f', '#3b82f6', '#0d9488', '#10b981', '#f59e0b', '#ec4899', '#8b5cf6'],
-          borderWidth: 2,
-          borderColor: '#ffffff',
-          hoverOffset: 4
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        cutout: '75%',
-        plugins: {
-          legend: { position: 'right', labels: { boxWidth: 10, font: { size: 10 } } },
-          tooltip: {
-            callbacks: {
-              label: (ctx) => ` ${ctx.label}: ${ctx.raw} bins`
-            }
-          }
-        }
-      }
-    });
-  }
+  const barCtx = document.getElementById('analytics-bar');
+  if (barCtx) new Chart(barCtx, {
+    type: 'bar',
+    data: {
+      labels: months,
+      datasets: [
+        { label: 'Plastic', data: [42,38,55,61,48,52,67,71,58,65], backgroundColor: '#3b82f6', borderRadius: 6 },
+        { label: 'Organic', data: [28,32,29,36,41,44,38,42,37,45], backgroundColor: '#10b981', borderRadius: 6 },
+        { label: 'Dry Waste', data: [18,21,24,19,22,25,27,23,26,28], backgroundColor: '#f59e0b', borderRadius: 6 },
+      ],
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: chartDefaults } }, scales: { x: { stacked: true, ticks: chartDefaults }, y: { stacked: true, ticks: chartDefaults } } },
+  });
 
-  const ab = document.getElementById('analytics-bar');
-  if (ab) {
-    new Chart(ab, {
-      type: 'bar',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [{
-          label: 'Waste (Tonnes)',
-          data: [120, 135, 125, 145, 160, 155],
-          backgroundColor: '#3b82f6',
-          borderRadius: 8,
-          borderSkipped: false
-        }]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { grid: { display: false } },
-          y: { grid: { color: '#f3f4f6' }, border: { dash: [4, 4] } }
-        },
-        plugins: { legend: { display: false } }
-      }
-    });
-  }
+  const lineCtx = document.getElementById('analytics-line');
+  if (lineCtx) new Chart(lineCtx, {
+    type: 'line',
+    data: {
+      labels: ['6am','9am','12pm','3pm','6pm','9pm'],
+      datasets: [
+        { label: 'Beach Zone', data: [22,35,61,78,88,72], borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.4, fill: true },
+        { label: 'Bus Stands', data: [41,55,68,82,79,65], borderColor: '#8b5cf6', backgroundColor: 'rgba(139,92,246,0.1)', tension: 0.4, fill: true },
+        { label: 'Mananchira', data: [18,28,44,56,61,52], borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4, fill: true },
+      ],
+    },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: chartDefaults } }, scales: { x: { ticks: chartDefaults }, y: { min: 0, max: 100, ticks: chartDefaults } } },
+  });
 
-  const al = document.getElementById('analytics-line');
-  if (al) {
-    const ctx = al.getContext('2d');
-    const gradient = ctx.createLinearGradient(0, 0, 0, 200);
-    gradient.addColorStop(0, 'rgba(16, 185, 129, 0.2)');
-    gradient.addColorStop(1, 'rgba(16, 185, 129, 0)');
+  const effCtx = document.getElementById('report-efficiency-chart');
+  if (effCtx) new Chart(effCtx, {
+    type: 'bar',
+    data: { labels: months, datasets: [{ label: 'On-time %', data: [88,85,91,87,92,89,94,93,90,95], backgroundColor: '#10b981', borderRadius: 6 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: chartDefaults } }, scales: { y: { min: 80, max: 100, ticks: chartDefaults }, x: { ticks: chartDefaults } } },
+  });
 
-    new Chart(al, {
-      type: 'line',
-      data: {
-        labels: ['Now', '+4h', '+8h', '+12h', '+16h', '+20h', '+24h'],
-        datasets: [
-          {
-            label: 'Predicted Fill %',
-            data: [62, 68, 75, 82, 85, 78, 70],
-            borderColor: '#10b981',
-            backgroundColor: gradient,
-            fill: true,
-            tension: 0.4,
-            pointBackgroundColor: '#10b981',
-            pointRadius: 3,
-            borderWidth: 2
-          },
-          {
-            label: 'Threshold',
-            data: [80, 80, 80, 80, 80, 80, 80],
-            borderColor: '#ef4444',
-            borderWidth: 2,
-            borderDash: [5, 5],
-            pointRadius: 0
-          }
-        ]
-      },
-      options: {
-        responsive: true,
-        maintainAspectRatio: false,
-        scales: {
-          x: { grid: { display: false } },
-          y: { grid: { color: '#f3f4f6' }, min: 40, max: 100 }
-        }
-      }
-    });
-  }
+  const fuelCtx = document.getElementById('report-fuel-chart');
+  if (fuelCtx) new Chart(fuelCtx, {
+    type: 'line',
+    data: { labels: months, datasets: [{ label: 'Liters', data: [340,320,310,295,280,265,270,258,245,240], borderColor: '#f59e0b', backgroundColor: 'rgba(245,158,11,0.1)', tension: 0.4, fill: true }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: chartDefaults } }, scales: { x: { ticks: chartDefaults }, y: { ticks: chartDefaults } } },
+  });
 
-  // Reports Charts
-  initReportsCharts();
+  const carbonCtx = document.getElementById('report-carbon-chart');
+  if (carbonCtx) new Chart(carbonCtx, {
+    type: 'bar',
+    data: { labels: months, datasets: [{ label: 'CO2e (tonnes)', data: [2.1,2.4,2.8,3.1,3.4,3.7,3.5,3.9,4.1,4.2], backgroundColor: 'rgba(16,185,129,0.7)', borderRadius: 6, borderColor: '#10b981', borderWidth: 1 }] },
+    options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { labels: chartDefaults } }, scales: { x: { ticks: chartDefaults }, y: { ticks: chartDefaults } } },
+  });
 }
 
-function initReportsCharts() {
-  const rcEff = document.getElementById('report-efficiency-chart');
-  if (rcEff) {
-    new Chart(rcEff, {
-      type: 'bar',
-      data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
-        datasets: [
-          { label: 'Target', data: [95, 95, 95, 95, 95, 95], type: 'line', borderColor: '#ef4444', borderWidth: 2, pointRadius: 0, borderDash: [5, 5] },
-          { label: 'Actual (%)', data: [88, 92, 90, 96, 94, 98], backgroundColor: '#10b981', borderRadius: 4 }
-        ]
-      },
-      options: { responsive: true, maintainAspectRatio: false, scales: { y: { min: 80, max: 100 } } }
-    });
-  }
+// ─── ROLE SELECTOR ────────────────────────────────────
+function populateRolePicker() {
+  const staffOpts = document.getElementById('staff-options');
+  const driverOpts = document.getElementById('driver-options');
 
-  const rcFuel = document.getElementById('report-fuel-chart');
-  if (rcFuel) {
-    new Chart(rcFuel, {
-      type: 'line',
-      data: {
-        labels: ['Week 1', 'Week 2', 'Week 3', 'Week 4'],
-        datasets: [{ label: 'Liters Consumed', data: [1200, 1150, 1080, 980], borderColor: '#f59e0b', backgroundColor: 'rgba(245, 158, 11, 0.1)', fill: true, tension: 0.4 }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
-  }
+  if (staffOpts) staffOpts.innerHTML = STAFF_MEMBERS.map(s => `
+    <div class="role-option" onclick="selectRole('staff', '${s.id}')">
+      <div class="role-option-avatar" style="background:linear-gradient(135deg,#10b981,#065f46)">${s.avatar}</div>
+      <div>
+        <div class="role-option-name">${s.name}</div>
+        <div class="role-option-sub">${s.zone.split('—').pop().trim()}</div>
+      </div>
+      <i class="ti ti-arrow-right" style="color:rgba(255,255,255,0.3);margin-left:auto;"></i>
+    </div>`).join('');
 
-  const rcCarb = document.getElementById('report-carbon-chart');
-  if (rcCarb) {
-    new Chart(rcCarb, {
-      type: 'bar',
-      data: {
-        labels: ['Zone A', 'Zone B', 'Zone C', 'Zone D'],
-        datasets: [{ label: 'CO2e Offset (Tons)', data: [45, 30, 60, 25], backgroundColor: '#3b82f6', borderRadius: 4 }]
-      },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+  if (driverOpts) driverOpts.innerHTML = DRIVERS.map(d => `
+    <div class="role-option" onclick="selectRole('driver', '${d.id}')">
+      <div class="role-option-avatar" style="background:linear-gradient(135deg,#f59e0b,#b45309)">${d.avatar}</div>
+      <div>
+        <div class="role-option-name">${d.name}</div>
+        <div class="role-option-sub">${d.vehicleName}</div>
+      </div>
+      <i class="ti ti-arrow-right" style="color:rgba(255,255,255,0.3);margin-left:auto;"></i>
+    </div>`).join('');
+}
+
+function toggleStaffPicker() {
+  const picker = document.getElementById('staff-picker');
+  const chevron = document.getElementById('staff-picker-chevron');
+  const visible = picker.style.display !== 'none';
+  picker.style.display = visible ? 'none' : 'block';
+  chevron.className = visible ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  chevron.style.color = 'rgba(255,255,255,0.3)';
+}
+
+function toggleDriverPicker() {
+  const picker = document.getElementById('driver-picker');
+  const chevron = document.getElementById('driver-picker-chevron');
+  const visible = picker.style.display !== 'none';
+  picker.style.display = visible ? 'none' : 'block';
+  chevron.className = visible ? 'ti ti-chevron-down' : 'ti ti-chevron-up';
+  chevron.style.color = 'rgba(255,255,255,0.3)';
+}
+
+function openRoleOverlay() {
+  populateRolePicker();
+  const overlay = document.getElementById('role-overlay');
+  if (overlay) {
+    overlay.style.display = 'flex';
+    requestAnimationFrame(() => { overlay.style.opacity = '1'; });
   }
 }
 
-// ═══ NAVIGATION LOGIC ═══
-function updatePill(el) {
-  document.querySelectorAll('.tab-pill').forEach(p => p.classList.remove('active'));
-  el.classList.add('active');
-}
-
-function setTimeFilter(el, range) {
-  updatePill(el);
-  switchTab('dashboard');
-
-  // Mock data update based on filter
-  const avgFillEl = document.getElementById('dash-avg-fill');
-  const criticalEl = document.getElementById('dash-critical');
-
-  if (range === 'today') {
-    if (avgFillEl) avgFillEl.innerText = '45%';
-    if (criticalEl) criticalEl.innerText = '2';
-    showToast('Data updated to Today\'s metrics');
-  } else if (range === 'week') {
-    if (avgFillEl) avgFillEl.innerText = '58%';
-    if (criticalEl) criticalEl.innerText = '5';
-    showToast('Data updated to This Week\'s metrics');
-  } else if (range === 'month') {
-    if (avgFillEl) avgFillEl.innerText = '62%';
-    if (criticalEl) criticalEl.innerText = '7';
-    showToast('Data updated to This Month\'s metrics');
+function closeRoleOverlay() {
+  const overlay = document.getElementById('role-overlay');
+  if (overlay) {
+    overlay.style.opacity = '0';
+    setTimeout(() => { overlay.style.display = 'none'; }, 300);
   }
 }
 
-// ═══ INIT ═══
-document.addEventListener('DOMContentLoaded', () => {
-  renderDashboard(); initMainMap(); initCharts();
-  document.querySelectorAll('.modal-overlay').forEach(el => { el.addEventListener('click', e => { if (e.target === el) el.classList.remove('active'); }); });
-  document.addEventListener('keydown', e => { if (e.key === 'Escape') document.querySelectorAll('.modal-overlay.active').forEach(m => m.classList.remove('active')); });
+function selectRole(role, userId) {
+  AppState.setRole(role, userId);
+  closeRoleOverlay();
+
+  if (role === 'admin') {
+    const app = document.getElementById('admin-app');
+    if (app) app.style.display = 'flex';
+    setTimeout(() => {
+      initMainMap();
+      updateDashboardStats();
+      renderAlerts();
+      initZoneChart();
+      renderMiniBinGrid();
+      renderTable();
+    }, 200);
+  } else if (role === 'staff') {
+    window.location.href = userId ? `staff.html?staff=${userId}` : 'staff.html';
+  } else if (role === 'driver') {
+    window.location.href = userId ? `driver.html?driver=${userId}` : 'driver.html';
+  }
+}
+
+// ─── SUBSCRIBE TO STATE CHANGES ───────────────────────
+AppState.subscribe(() => {
+  updateDashboardStats();
+  renderTable();
+  if (document.getElementById('tab-routes')?.classList.contains('active')) {
+    renderRoutePanels();
+    if (selectedRouteId) renderSingleRouteOnMap(selectedRouteId);
+  }
+  if (document.getElementById('tab-fleet')?.classList.contains('active')) {
+    renderFleetCards();
+  }
+  if (mainMap) {
+    mainMap.eachLayer(l => { if (l instanceof L.Marker) l.remove(); });
+    renderMapMarkers();
+  }
+});
+
+// ─── INIT ─────────────────────────────────────────────
+window.addEventListener('DOMContentLoaded', () => {
+  const hash = window.location.hash;
+  populateRolePicker();
+
+  // Always show role selector fresh (so demo is easy to navigate)
+  const overlay = document.getElementById('role-overlay');
+  const adminApp = document.getElementById('admin-app');
+
+  // If returning from staff/driver via #role-selector anchor
+  if (hash === '#role-selector') {
+    adminApp.style.display = 'none';
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+    history.replaceState(null, '', window.location.pathname);
+    return;
+  }
+
+  const savedRole = AppState.get('currentRole');
+  if (savedRole === 'admin') {
+    overlay.style.display = 'none';
+    adminApp.style.display = 'flex';
+    setTimeout(() => {
+      initMainMap();
+      updateDashboardStats();
+      renderAlerts();
+      initZoneChart();
+      renderMiniBinGrid();
+      renderTable();
+    }, 100);
+  } else {
+    adminApp.style.display = 'none';
+    overlay.style.display = 'flex';
+    overlay.style.opacity = '1';
+  }
 });

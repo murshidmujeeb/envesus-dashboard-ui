@@ -3,8 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>SmartBin IQ — Calicut Municipal Waste Management</title>
+<title>Envesus — Smart Waste Management</title>
 <link rel="stylesheet" href="styles.css">
+<link rel="stylesheet" href="responsive.css">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
@@ -12,7 +13,131 @@
 </head>
 <body>
 
-<div class="app-wrapper">
+<!-- ══════════════════════════════════════
+     ROLE SELECTOR OVERLAY
+══════════════════════════════════════ -->
+<div id="role-overlay" style="
+  position:fixed; inset:0; background:linear-gradient(135deg,#0f172a 0%,#1e3a5f 50%,#0f172a 100%);
+  z-index:9999; display:flex; align-items:center; justify-content:center;
+  padding:24px; opacity:1; transition:opacity 0.5s;
+">
+  <!-- Close button if inside demo -->
+  <button onclick="closeRoleOverlay()" title="Close role selector" style="
+    position:absolute; top:24px; right:24px; width:40px; height:40px; border-radius:50%;
+    background:rgba(255,255,255,0.1); border:1px solid rgba(255,255,255,0.2); color:white;
+    font-size:20px; cursor:pointer; display:flex; align-items:center; justify-content:center;
+    transition:background 0.2s;
+  " onmouseover="this.style.background='rgba(255,255,255,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.1)'">
+    <i class="ti ti-x"></i>
+  </button>
+  <div style="max-width:480px; width:100%; text-align:center;">
+    <!-- Logo -->
+    <div style="display:flex;align-items:center;justify-content:center;gap:14px;margin-bottom:36px;">
+      <div style="width:56px;height:56px;background:linear-gradient(135deg,#10b981,#3b82f6);border-radius:18px;display:flex;align-items:center;justify-content:center;font-size:28px;color:white;">
+        <i class="ti ti-recycle"></i>
+      </div>
+      <div style="text-align:left;">
+        <div style="font-size:28px;font-weight:800;color:white;letter-spacing:-0.5px;">Envesus</div>
+        <div style="font-size:14px;color:rgba(255,255,255,0.5);font-weight:500;">Smart Waste Management · Kozhikode</div>
+      </div>
+    </div>
+
+    <div style="font-size:16px;color:rgba(255,255,255,0.6);margin-bottom:28px;font-weight:500;">
+      Select your role to continue
+    </div>
+
+    <!-- Role Cards -->
+    <div style="display:flex;flex-direction:column;gap:14px;margin-bottom:28px;">
+      
+      <!-- Admin -->
+      <div onclick="selectRole('admin')" style="
+        background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+        border-radius:20px; padding:20px 24px; cursor:pointer;
+        display:flex; align-items:center; gap:18px; text-align:left;
+        transition:all 0.25s; position:relative;
+      " class="role-card" id="role-card-admin">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#3b82f6,#1d4ed8);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;flex-shrink:0;">
+          <i class="ti ti-layout-dashboard"></i>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:17px;font-weight:700;color:white;margin-bottom:4px;">Administrator</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);">Full dashboard, route optimization, fleet control, staff assignments</div>
+        </div>
+        <i class="ti ti-arrow-right" style="color:rgba(255,255,255,0.3);font-size:20px;"></i>
+      </div>
+
+      <!-- Select staff -->
+      <div onclick="toggleStaffPicker()" style="
+        background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+        border-radius:20px; padding:20px 24px; cursor:pointer;
+        display:flex; align-items:center; gap:18px; text-align:left;
+        transition:all 0.25s;
+      " class="role-card">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#10b981,#065f46);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;flex-shrink:0;">
+          <i class="ti ti-user-check"></i>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:17px;font-weight:700;color:white;margin-bottom:4px;">Collection Staff</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);">View assigned bins, confirm collections — mobile interface</div>
+        </div>
+        <i class="ti ti-chevron-down" style="color:rgba(255,255,255,0.3);font-size:20px;" id="staff-picker-chevron"></i>
+      </div>
+      
+      <!-- Staff picker -->
+      <div id="staff-picker" style="display:none;background:rgba(255,255,255,0.04);border-radius:16px;padding:12px;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:10px;padding:0 4px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Select Staff Member</div>
+        <div id="staff-options" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+
+      <!-- Select driver -->
+      <div onclick="toggleDriverPicker()" style="
+        background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.12);
+        border-radius:20px; padding:20px 24px; cursor:pointer;
+        display:flex; align-items:center; gap:18px; text-align:left;
+        transition:all 0.25s;
+      " class="role-card">
+        <div style="width:52px;height:52px;background:linear-gradient(135deg,#f59e0b,#b45309);border-radius:16px;display:flex;align-items:center;justify-content:center;font-size:26px;color:white;flex-shrink:0;">
+          <i class="ti ti-truck"></i>
+        </div>
+        <div style="flex:1;">
+          <div style="font-size:17px;font-weight:700;color:white;margin-bottom:4px;">Driver</div>
+          <div style="font-size:13px;color:rgba(255,255,255,0.5);">View route stops and progress — view only — mobile interface</div>
+        </div>
+        <i class="ti ti-chevron-down" style="color:rgba(255,255,255,0.3);font-size:20px;" id="driver-picker-chevron"></i>
+      </div>
+
+      <!-- Driver picker -->
+      <div id="driver-picker" style="display:none;background:rgba(255,255,255,0.04);border-radius:16px;padding:12px;border:1px solid rgba(255,255,255,0.1);">
+        <div style="font-size:11px;color:rgba(255,255,255,0.4);margin-bottom:10px;padding:0 4px;font-weight:700;text-transform:uppercase;letter-spacing:0.5px;">Select Driver</div>
+        <div id="driver-options" style="display:flex;flex-direction:column;gap:6px;"></div>
+      </div>
+
+    </div>
+
+    <div style="font-size:12px;color:rgba(255,255,255,0.25);">
+      Prototype demo — no authentication required
+    </div>
+  </div>
+</div>
+
+<style>
+.role-card:hover { background: rgba(255,255,255,0.1) !important; border-color: rgba(255,255,255,0.2) !important; transform: translateY(-2px); }
+.role-option {
+  display:flex; align-items:center; gap:12px;
+  padding:10px 12px; border-radius:12px; cursor:pointer;
+  background:rgba(255,255,255,0.06); border:1px solid rgba(255,255,255,0.1);
+  transition:all 0.2s;
+}
+.role-option:hover { background:rgba(255,255,255,0.12); }
+.role-option-avatar { width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:white;flex-shrink:0; }
+.role-option-name { font-size:13px;font-weight:600;color:white; }
+.role-option-sub { font-size:11px;color:rgba(255,255,255,0.4); }
+</style>
+
+<!-- ══════════════════════════════════════
+     MAIN ADMIN DASHBOARD
+══════════════════════════════════════ -->
+<div class="app-wrapper" id="admin-app" style="display:none;">
   <div class="dashboard-container">
     
     <!-- SIDEBAR -->
@@ -21,30 +146,34 @@
         <div class="logo-icon"><i class="ti ti-recycle"></i></div>
       </div>
       
-      <div class="nav-item active" onclick="switchTab('dashboard')" title="Dashboard">
+      <div class="nav-item active" onclick="switchTab('dashboard')" title="Dashboard" id="nav-dashboard">
         <i class="ti ti-layout-dashboard"></i>
       </div>
-      <div class="nav-item" onclick="switchTab('monitoring')" title="Bin Monitoring">
+      <div class="nav-item" onclick="switchTab('monitoring')" title="Bin Monitoring" id="nav-monitoring">
         <i class="ti ti-map-pin"></i>
       </div>
-      <div class="nav-item" onclick="switchTab('routes')" title="Route Optimization">
+      <div class="nav-item" onclick="switchTab('routes')" title="Route Optimization" id="nav-routes">
         <i class="ti ti-route"></i>
       </div>
-      <div class="nav-item" onclick="switchTab('analytics')" title="Analytics">
+      <div class="nav-item" onclick="switchTab('analytics')" title="Analytics" id="nav-analytics">
         <i class="ti ti-chart-bar"></i>
       </div>
-      <div class="nav-item" onclick="switchTab('cameras')" title="Cameras">
+      <div class="nav-item" onclick="switchTab('cameras')" title="Cameras" id="nav-cameras">
         <i class="ti ti-video"></i>
       </div>
-      <div class="nav-item" onclick="switchTab('alerts')" title="Alerts">
+      <div class="nav-item" onclick="switchTab('alerts')" title="Alerts" id="nav-alerts">
         <i class="ti ti-bell"></i><div class="nav-badge"></div>
       </div>
-      <div class="nav-item" onclick="switchTab('fleet')" title="Fleet">
+      <div class="nav-item" onclick="switchTab('fleet')" title="Fleet Status" id="nav-fleet">
         <i class="ti ti-truck"></i>
       </div>
       
       <div style="flex:1"></div>
       
+      <!-- Role Switcher -->
+      <div class="nav-item" onclick="document.getElementById('role-overlay').style.display='flex'; document.getElementById('role-overlay').style.opacity='1';" title="Switch Role">
+        <i class="ti ti-users"></i>
+      </div>
       <div class="nav-item" onclick="openModal('help-modal')" title="Help">
         <i class="ti ti-help"></i>
       </div>
@@ -75,7 +204,11 @@
           <div class="topbar-icon-btn" onclick="triggerExport()"><i class="ti ti-download"></i></div>
           <div class="topbar-icon-btn" onclick="openModal('settings-modal')"><i class="ti ti-settings"></i></div>
           
-          <div class="user-profile" onclick="showToast('Profile clicked')">
+          <button class="btn" onclick="openRoleOverlay()" style="border-radius:var(--r-full);padding:6px 14px;font-size:12px;font-weight:600;display:flex;align-items:center;gap:6px;background:var(--primary-light);border:1px solid var(--border-dark);color:var(--text);">
+            <i class="ti ti-users"></i> Switch Role
+          </button>
+
+          <div class="user-profile" onclick="openRoleOverlay()" style="cursor:pointer;" title="Click to switch role">
             <div class="avatar">AD</div>
             <div class="user-info">
               <div class="user-name">Admin Calicut</div>
@@ -97,7 +230,7 @@
         <!-- ═══ DASHBOARD TAB ═══ -->
         <div id="tab-dashboard" class="tab-content active">
           
-          <!-- STAT CARDS (Matched to reference design) -->
+          <!-- STAT CARDS -->
           <div class="stat-card-row">
             <div class="stat-card">
               <div class="stat-card-title">Total Bins</div>
@@ -107,33 +240,33 @@
             </div>
             <div class="stat-card">
               <div class="stat-card-title">Avg Fill Level</div>
-              <div class="stat-card-value" id="dash-avg-fill">62%</div>
+              <div class="stat-card-value" id="dash-avg-fill">—</div>
               <div class="stat-card-subtitle text-success">+8% vs yesterday</div>
               <div class="stat-card-icon" style="background:#fef3c7;color:#f59e0b;"><i class="ti ti-chart-bar"></i></div>
             </div>
             <div class="stat-card">
               <div class="stat-card-title">Critical Bins</div>
-              <div class="stat-card-value" id="dash-critical">7</div>
+              <div class="stat-card-value" id="dash-critical">—</div>
               <div class="stat-card-subtitle text-critical">Needs immediate collection</div>
               <div class="stat-card-icon" style="background:#fee2e2;color:#ef4444;"><i class="ti ti-alert-triangle"></i></div>
             </div>
             <div class="stat-card">
-              <div class="stat-card-title">Collections Today</div>
-              <div class="stat-card-value">23</div>
+              <div class="stat-card-title">Collected Today</div>
+              <div class="stat-card-value" id="dash-collected">0</div>
               <div class="stat-card-subtitle text-success">On schedule</div>
-              <div class="stat-card-icon" style="background:#d1fae5;color:#10b981;"><i class="ti ti-truck"></i></div>
+              <div class="stat-card-icon" style="background:#d1fae5;color:#10b981;"><i class="ti ti-check-circle"></i></div>
             </div>
             <div class="stat-card">
-              <div class="stat-card-title">Waste Collected</div>
-              <div class="stat-card-value">4.2t</div>
-              <div class="stat-card-subtitle text-success">+12% recycled</div>
-              <div class="stat-card-icon" style="background:#f3f4f6;color:#111827;"><i class="ti ti-recycle"></i></div>
+              <div class="stat-card-title">Active Routes</div>
+              <div class="stat-card-value">7</div>
+              <div class="stat-card-subtitle text-success">+12% efficiency</div>
+              <div class="stat-card-icon" style="background:#f3f4f6;color:#111827;"><i class="ti ti-route"></i></div>
             </div>
           </div>
 
           <!-- ROW 1 -->
           <div style="display:grid; grid-template-columns: 6fr 4fr; gap:24px; margin-bottom:24px;">
-            <!-- LIVE MAP (60%) -->
+            <!-- LIVE MAP -->
             <div class="card" style="display:flex; flex-direction:column; min-width: 0;">
               <div class="card-header">
                 <h2 class="card-title">Live Bin Map</h2>
@@ -142,7 +275,7 @@
               <div id="map" style="flex:1; min-height:400px;"></div>
             </div>
 
-            <!-- RIGHT COLUMN (40%) -->
+            <!-- RIGHT COLUMN -->
             <div style="display:flex; flex-direction:column; gap:24px; min-width: 0;">
               <!-- ACTIVE ALERTS -->
               <div class="card" style="flex:1; display:flex; flex-direction:column;">
@@ -150,9 +283,7 @@
                   <h2 class="card-title">Active Alerts</h2>
                   <div class="card-action" onclick="switchTab('alerts')"><i class="ti ti-arrow-up-right"></i></div>
                 </div>
-                <div class="item-list" id="dash-alerts-list" style="flex:1; max-height: 200px; overflow-y: auto; padding-right: 8px;">
-                  <!-- Populated by JS -->
-                </div>
+                <div class="item-list" id="dash-alerts-list" style="flex:1; max-height: 200px; overflow-y: auto; padding-right: 8px;"></div>
               </div>
 
               <!-- ZONE CHART -->
@@ -168,13 +299,10 @@
 
           <!-- ROW 2 -->
           <div style="display:grid; grid-template-columns: 4fr 6fr; gap:24px; margin-bottom:24px;">
-            <!-- LEFT COLUMN (40%) WIDGETS -->
             <div style="display:flex; flex-direction:column; gap:24px; min-width: 0;">
-              <!-- ENVIRONMENTAL OVERVIEW -->
+              <!-- ENVIRONMENTAL -->
               <div class="card">
-                <div class="card-header">
-                  <h2 class="card-title">Environmental Overview</h2>
-                </div>
+                <div class="card-header"><h2 class="card-title">Environmental Overview</h2></div>
                 <div class="card-body" style="padding:0;">
                   <div style="display:flex;gap:12px;">
                     <div style="flex:1; background:var(--bg);padding:16px;border-radius:var(--r-sm);">
@@ -200,31 +328,23 @@
                 <div class="item-list">
                   <div class="item-card" style="align-items:flex-start;background:var(--info-bg);border-color:transparent;padding:12px;">
                     <i class="ti ti-chart-line" style="color:var(--info);font-size:20px;margin-right:10px;"></i>
-                    <div style="flex:1;">
-                      <div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Beach Promenade</b> bins fill faster on weekends & evenings.</div>
-                    </div>
+                    <div style="flex:1;"><div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Beach Promenade</b> bins fill faster on weekends & evenings.</div></div>
                   </div>
                   <div class="item-card" style="align-items:flex-start;background:var(--warning-bg);border-color:transparent;padding:12px;">
                     <i class="ti ti-cloud-rain" style="color:var(--warning);font-size:20px;margin-right:10px;"></i>
-                    <div style="flex:1;">
-                      <div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Rain forecast.</b> Organic bins capacity reaching limits.</div>
-                    </div>
+                    <div style="flex:1;"><div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Rain forecast.</b> Organic bins capacity reaching limits.</div></div>
                   </div>
                   <div class="item-card" style="align-items:flex-start;background:var(--success-bg);border-color:transparent;padding:12px;">
                     <i class="ti ti-route" style="color:var(--success);font-size:20px;margin-right:10px;"></i>
-                    <div style="flex:1;">
-                      <div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Route Merge:</b> Route #3 & #5 today to save ~18km.</div>
-                    </div>
+                    <div style="flex:1;"><div style="font-size:12px;color:var(--text);line-height:1.4;"><b>Route Merge:</b> RT-03 & RT-07 today to save ~18km.</div></div>
                   </div>
                 </div>
               </div>
             </div>
 
-            <!-- FILL MATRIX (60%) -->
+            <!-- FILL MATRIX -->
             <div class="card" style="display:flex; flex-direction:column; min-width: 0;">
-              <div class="card-header">
-                <h2 class="card-title">Fill Level Matrix</h2>
-              </div>
+              <div class="card-header"><h2 class="card-title">Fill Level Matrix</h2></div>
               <div class="card-body" style="flex:1; display:flex; flex-direction:column; justify-content:center; padding: 24px;">
                 <div id="mini-bin-grid" class="bar-chart-scrollable"></div>
                 <div style="display:flex;gap:16px;margin-top:24px;font-size:12px;font-weight:600;color:var(--text-muted);justify-content:center;">
@@ -239,12 +359,12 @@
 
         <!-- ═══ MONITORING TAB ═══ -->
         <div id="tab-monitoring" class="tab-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
             <div>
               <h2 style="font-size:20px;font-weight:700;">Real-Time Bin Status</h2>
               <p class="text-muted" style="font-size:13px;margin-top:4px;">Manage and monitor all 60 smart bins across Kozhikode municipality.</p>
             </div>
-            <div style="display:flex;gap:12px;align-items:center;">
+            <div style="display:flex;gap:12px;align-items:center;flex-wrap:wrap;">
               <select class="btn" style="border:1px solid var(--border-dark);" id="filter-zone" onchange="renderTable()">
                 <option value="">All Zones</option>
                 <option value="Beach — Main Front Footpath">Beach — Main Front Footpath</option>
@@ -267,7 +387,7 @@
           <div class="card" style="padding:0;overflow:hidden;">
             <div class="table-wrap" style="margin:0;">
               <table>
-                <thead><tr><th>Bin ID</th><th>Location & Zone</th><th>Fill Level</th><th>Type</th><th>Sensors</th><th>Last Collected</th><th>Status</th><th>Action</th></tr></thead>
+                <thead><tr><th>Bin ID</th><th>Location & Zone</th><th>Fill Level</th><th>Type</th><th>Sensors</th><th>Status</th><th>Collected</th><th>Action</th></tr></thead>
                 <tbody id="bin-table-body"></tbody>
               </table>
             </div>
@@ -276,20 +396,45 @@
 
         <!-- ═══ ROUTES TAB ═══ -->
         <div id="tab-routes" class="tab-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
             <div>
-              <h2 style="font-size:20px;font-weight:700;">AI Route Optimization</h2>
-              <p class="text-muted" style="font-size:13px;margin-top:4px;">OSRM-based road routing with real-time traffic awareness.</p>
+              <h2 style="font-size:20px;font-weight:700;">Route Optimization</h2>
+              <p class="text-muted" style="font-size:13px;margin-top:4px;">Nearest-neighbour heuristic route ordering from registered bin coordinates. <span style="color:var(--warning);font-weight:600;">Estimated routes — not verified road network.</span></p>
+            </div>
+            <div style="display:flex;gap:10px;flex-wrap:wrap;">
+              <button class="btn" onclick="optimizeAllRoutes()"><i class="ti ti-brain"></i> Re-optimize All</button>
+              <button class="btn btn-primary" onclick="dispatchAllRoutes()"><i class="ti ti-send"></i> Dispatch All</button>
             </div>
           </div>
-          <div class="grid-2-1" style="grid-template-columns:1fr 2fr;">
-            <div style="display:flex;flex-direction:column;max-height:600px;overflow-y:auto;gap:16px;" id="route-cards-container"></div>
-            <div class="card" style="height:600px;padding:0;">
-              <div class="card-header" style="padding:24px 24px 16px;margin:0;">
-                <h2 class="card-title"><i class="ti ti-map-route text-blue"></i> Road Routing</h2>
-                <button class="btn btn-primary" onclick="dispatchAllRoutes()"><i class="ti ti-send"></i> Dispatch All</button>
+          <div style="display:flex;gap:12px;margin-bottom:16px;flex-wrap:wrap;align-items:center;">
+            <select class="btn" style="border:1px solid var(--border-dark);font-size:13px;" id="route-filter-zone" onchange="renderRoutePanels()">
+              <option value="">All Zones (7 Routes)</option>
+              <option value="Beach — Main Front Footpath">Beach — Main Front Footpath</option>
+              <option value="Private Bus Stand">Private Bus Stand</option>
+              <option value="Beach — Back of Starbucks">Beach — Back of Starbucks</option>
+              <option value="Beach — Food Kiosk Area">Beach — Food Kiosk Area</option>
+              <option value="KSRTC Terminal">KSRTC Terminal</option>
+              <option value="Mananchira Square">Mananchira Square</option>
+              <option value="Beach — Open Theatre Area">Beach — Open Theatre Area</option>
+            </select>
+            <select class="btn" style="border:1px solid var(--border-dark);font-size:13px;" id="route-filter-status" onchange="renderRoutePanels()">
+              <option value="">All Statuses</option>
+              <option value="pending">Pending</option>
+              <option value="progress">In Progress</option>
+              <option value="done">Completed</option>
+            </select>
+            <button class="btn" style="font-size:13px;" onclick="document.getElementById('route-filter-zone').value='';document.getElementById('route-filter-status').value='';renderRoutePanels();renderAllRoutesOnMap();showToast('Route filters reset','info');"><i class="ti ti-refresh"></i> Reset</button>
+            <span style="font-size:12px;color:var(--text-muted);margin-left:auto;" id="route-count-label">Showing 7 routes</span>
+          </div>
+
+          <div style="display:grid;grid-template-columns:1fr 2fr;gap:24px;" id="routes-layout">
+            <div style="display:flex;flex-direction:column;gap:14px;max-height:680px;overflow-y:auto;" id="route-cards-container"></div>
+            <div class="card" style="height:680px;padding:0;display:flex;flex-direction:column;">
+              <div class="card-header" style="padding:20px 24px 16px;margin:0;flex-shrink:0;">
+                <h2 class="card-title"><i class="ti ti-map-route text-blue"></i> Route Map <span style="font-size:12px;font-weight:500;color:var(--text-muted);" id="route-map-label"></span></h2>
+                <button class="btn" onclick="openAssignModal(selectedRouteId || 'RT-01')" id="assign-btn" style="display:none;"><i class="ti ti-user-plus"></i> Assign</button>
               </div>
-              <div id="route-map" style="border-radius:0 0 var(--r-lg) var(--r-lg);"></div>
+              <div id="route-map" style="flex:1;border-radius:0 0 var(--r-lg) var(--r-lg);min-height:0;"></div>
             </div>
           </div>
         </div>
@@ -311,7 +456,7 @@
 
         <!-- ═══ CAMERAS TAB ═══ -->
         <div id="tab-cameras" class="tab-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
             <div>
               <h2 style="font-size:20px;font-weight:700;">Surveillance Network</h2>
               <p class="text-muted" style="font-size:13px;margin-top:4px;">Live feeds from bin-mounted cameras with motion detection.</p>
@@ -321,9 +466,10 @@
               <button class="btn" style="background:var(--red);color:#fff;border-color:var(--red);" onclick="toggleRecording(this)"><i class="ti ti-player-record"></i> REC All</button>
             </div>
           </div>
-          
           <style>
             .cam-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:24px; }
+            @media(max-width:1024px){ .cam-grid { grid-template-columns:repeat(2,1fr); } }
+            @media(max-width:600px){ .cam-grid { grid-template-columns:1fr; } }
             .cam-feed { background:#111827; border-radius:var(--r-sm); aspect-ratio:16/9; position:relative; overflow:hidden; border:1px solid var(--border-dark); cursor:pointer; transition:transform 0.2s; }
             .cam-feed:hover { transform:scale(1.02); }
             .cam-feed canvas { width:100%; height:100%; display:block; opacity:0.85; }
@@ -333,7 +479,6 @@
             .cam-status { font-size:11px; color:#9ca3af; margin-top:2px; }
             .cam-live { position:absolute; top:12px; right:12px; background:var(--red); color:#fff; font-size:10px; font-weight:700; padding:4px 8px; border-radius:var(--r-full); animation:pulse 2s infinite; letter-spacing:0.5px; }
           </style>
-          
           <div class="cam-grid" id="cam-grid-container"></div>
         </div>
 
@@ -345,34 +490,38 @@
 
         <!-- ═══ FLEET TAB ═══ -->
         <div id="tab-fleet" class="tab-content">
-          <h2 style="font-size:20px;font-weight:700;margin-bottom:24px;">Fleet Status</h2>
-          <div class="card">
-            <p class="text-muted" style="margin-bottom:24px;">Tracking integrated with GPS modules on 4 active trucks.</p>
-            <div class="item-list" id="fleet-list"></div>
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+            <div>
+              <h2 style="font-size:20px;font-weight:700;">Fleet Status</h2>
+              <p class="text-muted" style="font-size:13px;margin-top:4px;">
+                <span style="background:#fef3c7;color:#92400e;padding:2px 8px;border-radius:var(--r-full);font-weight:600;font-size:11px;">Demo Data</span>
+                Live GPS tracking not connected.
+              </p>
+            </div>
+            <button class="btn btn-primary" onclick="openModal('assign-fleet-modal')"><i class="ti ti-plus"></i> Reassign Route</button>
           </div>
+          <div id="fleet-cards-container" style="display:flex;flex-direction:column;gap:16px;"></div>
         </div>
 
         <!-- ═══ REPORTS TAB ═══ -->
         <div id="tab-reports" class="tab-content">
-          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
             <div>
               <h2 style="font-size:20px;font-weight:700;">Executive Reports & Dashboards</h2>
               <p class="text-muted" style="font-size:13px;margin-top:4px;">In-depth operational visualizations and exportable metrics.</p>
             </div>
             <button class="btn btn-primary" onclick="triggerExport()"><i class="ti ti-download"></i> Download PDF Report</button>
           </div>
-          
           <div class="grid-2">
             <div class="card">
               <div class="card-header"><h2 class="card-title">Collection Efficiency</h2></div>
               <div style="height:250px;width:100%;"><canvas id="report-efficiency-chart"></canvas></div>
             </div>
             <div class="card">
-              <div class="card-header"><h2 class="card-title">Fleet Fuel Consumption (Liters)</h2></div>
+              <div class="card-header"><h2 class="card-title">Fleet Fuel Consumption (L)</h2></div>
               <div style="height:250px;width:100%;"><canvas id="report-fuel-chart"></canvas></div>
             </div>
           </div>
-
           <div class="card" style="margin-top:24px;">
             <div class="card-header"><h2 class="card-title">Monthly Carbon Offset (CO2e)</h2></div>
             <div style="height:300px;width:100%;"><canvas id="report-carbon-chart"></canvas></div>
@@ -401,6 +550,46 @@
   </div>
 </div>
 
+<!-- ROUTE ASSIGN MODAL -->
+<div class="modal-overlay" id="assign-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Assign Route</h2>
+      <button class="modal-close" onclick="closeModal('assign-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body" id="assign-modal-body"></div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('assign-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveRouteAssignment()"><i class="ti ti-check"></i> Save Assignment</button>
+    </div>
+  </div>
+</div>
+
+<!-- FLEET ASSIGN MODAL -->
+<div class="modal-overlay" id="assign-fleet-modal">
+  <div class="modal">
+    <div class="modal-header">
+      <h2 class="modal-title">Reassign Route</h2>
+      <button class="modal-close" onclick="closeModal('assign-fleet-modal')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="modal-body">
+      <p style="color:var(--text-muted);font-size:14px;margin-bottom:20px;">Select a route and update its staff and driver assignment.</p>
+      <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;">Route</label>
+      <select class="search-input" style="width:100%;padding:10px 16px;margin-bottom:16px;" id="fleet-assign-route">
+        <option value="">Select route...</option>
+      </select>
+      <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;">Collection Staff</label>
+      <select class="search-input" style="width:100%;padding:10px 16px;margin-bottom:16px;" id="fleet-assign-staff"></select>
+      <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;">Driver</label>
+      <select class="search-input" style="width:100%;padding:10px 16px;" id="fleet-assign-driver"></select>
+    </div>
+    <div class="modal-footer">
+      <button class="btn" onclick="closeModal('assign-fleet-modal')">Cancel</button>
+      <button class="btn btn-primary" onclick="saveFleetAssignment()"><i class="ti ti-check"></i> Update Assignment</button>
+    </div>
+  </div>
+</div>
+
 <div class="modal-overlay" id="settings-modal">
   <div class="modal">
     <div class="modal-header">
@@ -410,16 +599,20 @@
     <div class="modal-body">
       <div style="margin-bottom:24px;">
         <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;">Map Provider</label>
-        <select class="search-input" style="width:100%;padding:10px 16px;"><option>OpenStreetMap (Default)</option><option>Google Maps (API Key Required)</option><option>Mapbox Streets</option></select>
+        <select class="search-input" style="width:100%;padding:10px 16px;"><option selected>CARTO Positron (Active)</option><option>OpenStreetMap</option></select>
       </div>
       <div style="margin-bottom:24px;">
         <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;">Data Refresh Rate</label>
         <select class="search-input" style="width:100%;padding:10px 16px;"><option>Real-time (WebSockets)</option><option selected>Every 30 seconds</option><option>Every 5 minutes</option></select>
       </div>
-      <div>
+      <div style="margin-bottom:16px;">
         <label style="display:flex;align-items:center;gap:12px;cursor:pointer;font-size:14px;font-weight:500;">
           <input type="checkbox" checked style="width:18px;height:18px;accent-color:var(--primary);"> Enable SMS Alerts for Critical Bins
         </label>
+      </div>
+      <div style="border-top:1px solid var(--border);padding-top:16px;">
+        <label style="display:block;margin-bottom:8px;font-size:14px;font-weight:600;color:var(--critical);">Demo Controls</label>
+        <button class="btn" style="width:100%;border-color:var(--critical);color:var(--critical);" onclick="resetDemo()"><i class="ti ti-refresh"></i> Reset All Demo Data</button>
       </div>
     </div>
     <div class="modal-footer">
@@ -436,12 +629,18 @@
       <button class="modal-close" onclick="closeModal('help-modal')"><i class="ti ti-x"></i></button>
     </div>
     <div class="modal-body">
-      <h3 style="margin-bottom:12px;font-size:16px;">Dashboard Features</h3>
+      <h3 style="margin-bottom:12px;font-size:16px;">Three-Role Prototype</h3>
       <ul style="padding-left:24px;line-height:2;color:var(--text-secondary);font-size:14px;margin-bottom:24px;">
-        <li><b>Map:</b> Uses OpenStreetMap for realistic geography.</li>
-        <li><b>Routing:</b> OSRM API generates actual road-based routes.</li>
-        <li><b>Analytics:</b> Predictive algorithms estimate bin capacity.</li>
-        <li><b>Cameras:</b> 8 bin-mounted cameras with motion detection.</li>
+        <li><b>Admin:</b> Full dashboard, route optimization, fleet control, staff assignments.</li>
+        <li><b>Collection Staff:</b> Mobile view of assigned bins. Can confirm collections.</li>
+        <li><b>Driver:</b> Mobile route view. <b>Cannot</b> confirm collections.</li>
+      </ul>
+      <h3 style="margin-bottom:12px;font-size:16px;">Key Features</h3>
+      <ul style="padding-left:24px;line-height:2;color:var(--text-secondary);font-size:14px;margin-bottom:24px;">
+        <li><b>Map:</b> CARTO Positron tiles · 60 real Kozhikode bin locations.</li>
+        <li><b>Route Optimization:</b> Nearest-neighbour heuristic from actual coordinates.</li>
+        <li><b>Shared State:</b> Collection confirmations update Admin, Staff & Driver views.</li>
+        <li><b>Reset:</b> Settings → Reset Demo Data to clear all collections.</li>
       </ul>
       <h3 style="margin-bottom:12px;font-size:16px;">Keyboard Shortcuts</h3>
       <div style="font-size:14px;color:var(--text-secondary);line-height:2.5;">
@@ -458,6 +657,7 @@
   </div>
 </div>
 
+<script src="state.js"></script>
 <script src="dashboard.js"></script>
 </body>
 </html>

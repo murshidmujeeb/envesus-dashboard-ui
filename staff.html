@@ -1,0 +1,618 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>Envesus — Collection Staff</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --bg: #f1f5f9;
+  --surface: #ffffff;
+  --primary: #111827;
+  --accent: #059669;
+  --accent-light: #d1fae5;
+  --success: #10b981;
+  --success-bg: #d1fae5;
+  --warning: #f59e0b;
+  --warning-bg: #fef3c7;
+  --critical: #ef4444;
+  --critical-bg: #fee2e2;
+  --text: #111827;
+  --text-muted: #6b7280;
+  --border: #e5e7eb;
+  --r: 16px;
+  --r-sm: 12px;
+  --r-full: 9999px;
+  --font: 'Plus Jakarta Sans', sans-serif;
+}
+
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: #e2e8f0;
+  font-family: var(--font);
+  min-height: 100vh;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding: 0;
+}
+
+/* ── PHONE CONTAINER ── */
+.phone-wrap {
+  width: 100%;
+  max-width: 420px;
+  min-height: 100vh;
+  background: var(--bg);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  overflow: hidden;
+}
+
+@media (min-width: 500px) {
+  body { align-items: center; padding: 24px 16px; background: linear-gradient(135deg, #e2e8f0 0%, #dbeafe 100%); }
+  .phone-wrap {
+    min-height: calc(100vh - 48px);
+    max-height: 92vh;
+    border-radius: 36px;
+    overflow: hidden;
+    box-shadow: 0 32px 64px -12px rgba(0,0,0,0.25);
+  }
+}
+
+/* ── HEADER ── */
+.staff-header {
+  background: var(--primary);
+  color: white;
+  padding: 20px 20px 16px;
+}
+.staff-header-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+.staff-brand { display: flex; align-items: center; gap: 10px; }
+.staff-brand-icon {
+  width: 36px; height: 36px; background: rgba(255,255,255,0.15);
+  border-radius: 10px; display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+.staff-brand-name { font-size: 16px; font-weight: 700; }
+.staff-brand-sub { font-size: 11px; color: rgba(255,255,255,0.6); }
+
+.back-btn {
+  background: rgba(255,255,255,0.12); border: none; color: white;
+  border-radius: 10px; padding: 8px 14px; font-size: 13px; font-weight: 600;
+  cursor: pointer; display: flex; align-items: center; gap: 6px; font-family: var(--font);
+  transition: background 0.2s;
+}
+.back-btn:hover { background: rgba(255,255,255,0.2); }
+
+.staff-profile {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(255,255,255,0.08);
+  border-radius: 14px;
+  padding: 14px 16px;
+}
+.staff-avatar {
+  width: 48px; height: 48px; border-radius: 50%;
+  background: var(--accent); color: white;
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 16px; flex-shrink: 0;
+}
+.staff-name { font-size: 16px; font-weight: 700; }
+.staff-zone { font-size: 12px; color: rgba(255,255,255,0.6); margin-top: 2px; }
+.staff-badge {
+  margin-left: auto; background: var(--accent);
+  border-radius: var(--r-full); padding: 4px 12px;
+  font-size: 11px; font-weight: 700;
+}
+
+/* ── CONTENT ── */
+.staff-content {
+  flex: 1;
+  overflow-y: auto;
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+/* ── SUMMARY CARDS ── */
+.summary-row {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.summary-card {
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  text-align: center;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.summary-num { font-size: 26px; font-weight: 800; color: var(--text); letter-spacing: -1px; }
+.summary-label { font-size: 11px; color: var(--text-muted); font-weight: 600; margin-top: 2px; }
+
+/* ── PROGRESS BAR ── */
+.route-progress-card {
+  background: var(--surface);
+  border-radius: var(--r);
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+.route-progress-header {
+  display: flex; align-items: center; justify-content: space-between; margin-bottom: 10px;
+}
+.route-progress-label { font-size: 14px; font-weight: 700; }
+.route-progress-pct { font-size: 14px; font-weight: 700; color: var(--accent); }
+.progress-track {
+  height: 8px; background: var(--border); border-radius: var(--r-full); overflow: hidden;
+}
+.progress-fill {
+  height: 100%; border-radius: var(--r-full); background: var(--accent);
+  transition: width 0.5s ease;
+}
+.route-progress-sub {
+  margin-top: 8px; font-size: 12px; color: var(--text-muted);
+  display: flex; justify-content: space-between;
+}
+
+/* ── SECTION HEADER ── */
+.section-header {
+  display: flex; align-items: center; justify-content: space-between;
+  margin-bottom: 2px;
+}
+.section-title { font-size: 14px; font-weight: 700; color: var(--text); }
+.section-count {
+  background: var(--border); border-radius: var(--r-full);
+  padding: 2px 10px; font-size: 12px; font-weight: 600; color: var(--text-muted);
+}
+
+/* ── BIN CARDS ── */
+.bin-list { display: flex; flex-direction: column; gap: 10px; }
+
+.bin-card {
+  background: var(--surface);
+  border-radius: var(--r-sm);
+  padding: 14px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border-left: 4px solid transparent;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  transition: all 0.25s;
+}
+.bin-card.critical  { border-left-color: var(--critical); }
+.bin-card.warning   { border-left-color: var(--warning); }
+.bin-card.normal    { border-left-color: var(--success); }
+.bin-card.collected { border-left-color: #9ca3af; opacity: 0.7; }
+
+.bin-fill-ring {
+  width: 48px; height: 48px; flex-shrink: 0;
+  border-radius: 50%; display: flex; align-items: center; justify-content: center;
+  font-size: 13px; font-weight: 700; position: relative;
+  background: conic-gradient(var(--fill-color, #10b981) var(--fill-pct, 0%), #f3f4f6 0%);
+}
+.bin-fill-ring-inner {
+  width: 34px; height: 34px; border-radius: 50%;
+  background: white; display: flex; align-items: center; justify-content: center;
+  font-size: 11px; font-weight: 700;
+}
+
+.bin-info { flex: 1; min-width: 0; }
+.bin-id { font-size: 13px; font-weight: 700; color: var(--text); }
+.bin-name { font-size: 12px; color: var(--text-muted); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.bin-meta { font-size: 11px; color: var(--text-muted); margin-top: 4px; }
+
+.collect-btn {
+  background: var(--accent); border: none; color: white;
+  border-radius: 10px; padding: 10px 14px;
+  font-size: 13px; font-weight: 700; cursor: pointer;
+  display: flex; align-items: center; gap: 6px;
+  font-family: var(--font);
+  transition: all 0.2s; flex-shrink: 0;
+  white-space: nowrap;
+}
+.collect-btn:hover { background: #047857; transform: scale(1.02); }
+.collect-btn:active { transform: scale(0.98); }
+.collect-btn.collected-btn {
+  background: #f1f5f9; color: #059669; border: 1px solid #a7f3d0; cursor: pointer;
+}
+.collect-btn.collected-btn:hover { background: #fee2e2; color: #dc2626; border-color: #fca5a5; }
+
+/* ── MAP TOGGLE ── */
+.map-toggle-btn {
+  background: var(--primary); color: white; border: none;
+  border-radius: var(--r-full); padding: 10px 20px;
+  font-size: 13px; font-weight: 600; cursor: pointer;
+  display: flex; align-items: center; gap: 8px;
+  font-family: var(--font); width: 100%;
+  justify-content: center; transition: background 0.2s;
+}
+.map-toggle-btn:hover { background: #374151; }
+
+#staff-map-wrap { border-radius: var(--r); overflow: hidden; height: 260px; display: none; }
+#staff-map { height: 100%; width: 100%; }
+
+/* ── BOTTOM NAV ── */
+.bottom-nav {
+  background: var(--surface);
+  border-top: 1px solid var(--border);
+  display: flex;
+  padding: 12px 8px;
+  padding-bottom: max(12px, env(safe-area-inset-bottom));
+  gap: 4px;
+}
+.bottom-nav-item {
+  flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 8px 4px; border-radius: 12px; cursor: pointer;
+  color: var(--text-muted); font-size: 10px; font-weight: 600;
+  transition: all 0.2s;
+}
+.bottom-nav-item.active { color: var(--accent); background: var(--accent-light); }
+.bottom-nav-item i { font-size: 22px; }
+
+/* ── TOAST ── */
+#staff-toast {
+  position: fixed; bottom: 90px; left: 50%; transform: translateX(-50%) translateY(20px);
+  background: var(--primary); color: white; padding: 12px 20px;
+  border-radius: var(--r-full); font-size: 14px; font-weight: 600;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.2); opacity: 0;
+  transition: all 0.3s; pointer-events: none; white-space: nowrap;
+  z-index: 9999;
+}
+#staff-toast.show { opacity: 1; transform: translateX(-50%) translateY(0); }
+
+/* ── TABS ── */
+.tab-section { display: none; }
+.tab-section.active { display: block; }
+
+/* ── EMPTY STATE ── */
+.empty-state {
+  text-align: center; padding: 32px 16px; color: var(--text-muted);
+}
+.empty-state i { font-size: 48px; margin-bottom: 12px; display: block; }
+</style>
+</head>
+<body>
+
+<div class="phone-wrap">
+  <!-- HEADER -->
+  <div class="staff-header">
+    <div class="staff-header-top">
+      <div class="staff-brand">
+        <div class="staff-brand-icon"><i class="ti ti-recycle"></i></div>
+        <div>
+          <div class="staff-brand-name">Envesus</div>
+          <div class="staff-brand-sub">Collection Staff</div>
+        </div>
+      </div>
+      <button class="back-btn" onclick="goBack()"><i class="ti ti-arrow-left"></i> Switch Role</button>
+    </div>
+
+    <div class="staff-profile" id="staff-profile">
+      <div class="staff-avatar" id="staff-avatar">AK</div>
+      <div>
+        <div class="staff-name" id="staff-name">Arun Kumar</div>
+        <div class="staff-zone" id="staff-zone">Beach — Main Front Footpath</div>
+      </div>
+      <div class="staff-badge" id="staff-route-label">Route RT-01</div>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="staff-content" id="staff-content">
+
+    <!-- SUMMARY -->
+    <div class="summary-row" id="summary-row">
+      <div class="summary-card">
+        <div class="summary-num" id="sum-total">0</div>
+        <div class="summary-label">Assigned</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" id="sum-done" style="color:var(--success)">0</div>
+        <div class="summary-label">Collected</div>
+      </div>
+      <div class="summary-card">
+        <div class="summary-num" id="sum-remain" style="color:var(--critical)">0</div>
+        <div class="summary-label">Remaining</div>
+      </div>
+    </div>
+
+    <!-- ROUTE PROGRESS -->
+    <div class="route-progress-card">
+      <div class="route-progress-header">
+        <div class="route-progress-label">Route Progress</div>
+        <div class="route-progress-pct" id="progress-pct">0%</div>
+      </div>
+      <div class="progress-track">
+        <div class="progress-fill" id="progress-bar" style="width:0%"></div>
+      </div>
+      <div class="route-progress-sub">
+        <span id="progress-sub-left">—</span>
+        <span id="progress-sub-right">—</span>
+      </div>
+    </div>
+
+    <!-- MAP TOGGLE -->
+    <button class="map-toggle-btn" onclick="toggleMap()" id="map-toggle-btn">
+      <i class="ti ti-map-pin"></i> <span id="map-btn-label">Show Bin Map</span>
+    </button>
+    <div id="staff-map-wrap">
+      <div id="staff-map"></div>
+    </div>
+
+    <!-- CRITICAL BINS -->
+    <div id="critical-section">
+      <div class="section-header">
+        <div class="section-title" style="color:var(--critical)"><i class="ti ti-alert-triangle"></i> Critical Bins</div>
+        <div class="section-count" id="critical-count" style="background:#fee2e2;color:var(--critical)">0</div>
+      </div>
+      <div class="bin-list" id="critical-list"></div>
+    </div>
+
+    <!-- ALL BINS -->
+    <div>
+      <div class="section-header">
+        <div class="section-title">All Assigned Bins</div>
+        <div class="section-count" id="all-count">0</div>
+      </div>
+      <div class="bin-list" id="all-bins-list"></div>
+    </div>
+
+  </div>
+
+  <!-- BOTTOM NAV -->
+  <nav class="bottom-nav">
+    <div class="bottom-nav-item active" onclick="setActiveNav(this, 'bins')">
+      <i class="ti ti-list-check"></i>
+      <span>Bins</span>
+    </div>
+    <div class="bottom-nav-item" onclick="setActiveNav(this, 'map-tab')">
+      <i class="ti ti-map"></i>
+      <span>Map</span>
+    </div>
+    <div class="bottom-nav-item" onclick="setActiveNav(this, 'done')">
+      <i class="ti ti-check-circle"></i>
+      <span>Done</span>
+    </div>
+  </nav>
+</div>
+
+<div id="staff-toast"></div>
+
+<script src="state.js"></script>
+<script>
+AppState.init();
+
+let staffMap = null;
+let staffMarkers = {};
+let mapVisible = false;
+let currentNav = 'bins';
+
+// ── Load current staff member ────────────────────────
+function getCurrentStaff() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const paramId = urlParams.get('staff');
+  if (paramId && STAFF_MEMBERS.some(s => s.id === paramId)) {
+    return STAFF_MEMBERS.find(s => s.id === paramId);
+  }
+  const id = AppState.get('currentStaffId');
+  return STAFF_MEMBERS.find(s => s.id === id) || STAFF_MEMBERS[0];
+}
+
+function getCurrentRoutes() {
+  const staff = getCurrentStaff();
+  return AppState.getStaffRoutes(staff.id);
+}
+
+// ── Render UI ────────────────────────────────────────
+function renderStaffDashboard() {
+  const staff = getCurrentStaff();
+  const routes = getCurrentRoutes();
+
+  // Header
+  document.getElementById('staff-avatar').textContent = staff.avatar;
+  document.getElementById('staff-name').textContent = staff.name;
+  document.getElementById('staff-zone').textContent = staff.zone;
+  document.getElementById('staff-route-label').textContent = routes.map(r => r.id).join(', ');
+
+  // Aggregate all bins from all staff routes
+  let allBins = [];
+  routes.forEach(route => {
+    allBins = allBins.concat(AppState.getBinsForRoute(route.id));
+  });
+
+  const total = allBins.length;
+  const done = allBins.filter(b => b.collected).length;
+  const remain = total - done;
+  const pct = total ? Math.round(done / total * 100) : 0;
+
+  document.getElementById('sum-total').textContent = total;
+  document.getElementById('sum-done').textContent = done;
+  document.getElementById('sum-remain').textContent = remain;
+  document.getElementById('progress-pct').textContent = pct + '%';
+  document.getElementById('progress-bar').style.width = pct + '%';
+  document.getElementById('progress-sub-left').textContent = `${done} collected`;
+  document.getElementById('progress-sub-right').textContent = `${remain} remaining`;
+
+  // Critical bins
+  const criticals = allBins.filter(b => b.fill >= 80 && !b.collected);
+  document.getElementById('critical-count').textContent = criticals.length;
+  const criticalSection = document.getElementById('critical-section');
+  criticalSection.style.display = criticals.length ? 'block' : 'none';
+  renderBinList('critical-list', criticals);
+
+  // All bins (current nav)
+  renderAllBins(allBins);
+  document.getElementById('all-count').textContent = allBins.length;
+
+  // Map markers
+  if (staffMap) updateMapMarkers(allBins);
+}
+
+function renderBinList(containerId, bins) {
+  const container = document.getElementById(containerId);
+  if (!container) return;
+  if (bins.length === 0) {
+    container.innerHTML = `<div class="empty-state"><i class="ti ti-check-circle" style="color:var(--success)"></i>All clear!</div>`;
+    return;
+  }
+  container.innerHTML = bins.map(bin => binCard(bin)).join('');
+}
+
+function renderAllBins(allBins) {
+  const container = document.getElementById('all-bins-list');
+  if (!container) return;
+
+  let bins;
+  if (currentNav === 'done') {
+    bins = allBins.filter(b => b.collected);
+    if (bins.length === 0) {
+      container.innerHTML = `<div class="empty-state"><i class="ti ti-hourglass" style="color:var(--warning)"></i>No collections yet</div>`;
+      return;
+    }
+  } else {
+    bins = allBins;
+  }
+  container.innerHTML = bins.map(bin => binCard(bin)).join('');
+}
+
+function binCard(bin) {
+  const fillPct = bin.fill;
+  const color = getFillHex(fillPct);
+  const statusClass = bin.collected ? 'collected' : fillPct >= 80 ? 'critical' : fillPct >= 50 ? 'warning' : 'normal';
+  const pctStr = Math.round(fillPct * 3.6) + 'deg';
+
+  const collectButton = bin.collected
+    ? `<button class="collect-btn collected-btn" onclick="undoCollect('${bin.id}', event)" title="Click to undo collection"><i class="ti ti-check"></i> Done <span style="font-size:10px;opacity:0.8;margin-left:2px;">(undo)</span></button>`
+    : `<button class="collect-btn" onclick="collectBin('${bin.id}', event)"><i class="ti ti-check"></i> Collect</button>`;
+
+  return `
+    <div class="bin-card ${statusClass}" id="card-${bin.id}">
+      <div class="bin-fill-ring" style="--fill-pct:${fillPct * 3.6}deg;--fill-color:${color}; background: conic-gradient(${color} ${fillPct * 3.6}deg, #f3f4f6 0deg);">
+        <div class="bin-fill-ring-inner" style="color:${color}">${fillPct}%</div>
+      </div>
+      <div class="bin-info">
+        <div class="bin-id">${bin.id}</div>
+        <div class="bin-name">${bin.name}</div>
+        <div class="bin-meta">${bin.type} · ${bin.collected ? '✓ Collected ' + (bin.collectedAt || '') : 'Last: ' + bin.time}</div>
+      </div>
+      ${collectButton}
+    </div>`;
+}
+
+// ── Collect action ───────────────────────────────────
+function collectBin(binId, event) {
+  event.stopPropagation();
+  const staff = getCurrentStaff();
+  AppState.collectBin(binId, staff.id);
+  showToast('✓ Bin ' + binId + ' collected!');
+  renderStaffDashboard();
+}
+
+// ── Undo Collect action ──────────────────────────────
+function undoCollect(binId, event) {
+  event.stopPropagation();
+  AppState.uncollectBin(binId);
+  showToast('Collection reverted for ' + binId);
+  renderStaffDashboard();
+}
+
+// ── Map ──────────────────────────────────────────────
+function initMap() {
+  if (staffMap) return;
+  const staff = getCurrentStaff();
+  const routes = getCurrentRoutes();
+  let allBins = [];
+  routes.forEach(r => allBins = allBins.concat(AppState.getBinsForRoute(r.id)));
+
+  const center = allBins.length
+    ? [allBins.reduce((s,b)=>s+b.lat,0)/allBins.length, allBins.reduce((s,b)=>s+b.lng,0)/allBins.length]
+    : [11.2550, 75.7750];
+
+  staffMap = L.map('staff-map').setView(center, 16);
+  L.tileLayer(getCartoTileUrl(), {
+    attribution: '© CARTO', subdomains: 'abcd', maxZoom: 19,
+  }).addTo(staffMap);
+  updateMapMarkers(allBins);
+}
+
+function updateMapMarkers(allBins) {
+  if (!staffMap) return;
+  // Remove old markers
+  Object.values(staffMarkers).forEach(m => m.remove());
+  staffMarkers = {};
+
+  allBins.forEach(bin => {
+    const color = bin.collected ? '#9ca3af' : getFillHex(bin.fill);
+    const icon = L.divIcon({
+      className: '',
+      html: `<div style="width:32px;height:32px;border-radius:50%;background:${color};border:3px solid white;box-shadow:0 2px 8px rgba(0,0,0,0.3);display:flex;align-items:center;justify-content:center;color:white;font-size:10px;font-weight:700;">${bin.collected ? '✓' : bin.fill + '%'}</div>`,
+      iconSize: [32, 32], iconAnchor: [16, 16],
+    });
+    const marker = L.marker([bin.lat, bin.lng], { icon })
+      .addTo(staffMap)
+      .bindPopup(`<b>${bin.id}</b><br>${bin.name}<br>Fill: ${bin.fill}% ${bin.collected ? '— ✓ Collected' : ''}`);
+    staffMarkers[bin.id] = marker;
+  });
+}
+
+function toggleMap() {
+  const wrap = document.getElementById('staff-map-wrap');
+  const btn = document.getElementById('map-btn-label');
+  mapVisible = !mapVisible;
+  wrap.style.display = mapVisible ? 'block' : 'none';
+  btn.textContent = mapVisible ? 'Hide Map' : 'Show Bin Map';
+  if (mapVisible) {
+    if (!staffMap) initMap();
+    else setTimeout(() => staffMap.invalidateSize(), 100);
+  }
+}
+
+// ── Navigation ───────────────────────────────────────
+function setActiveNav(el, tab) {
+  document.querySelectorAll('.bottom-nav-item').forEach(i => i.classList.remove('active'));
+  el.classList.add('active');
+  currentNav = tab;
+
+  if (tab === 'map-tab') {
+    mapVisible = true;
+    document.getElementById('staff-map-wrap').style.display = 'block';
+    document.getElementById('map-btn-label').textContent = 'Hide Map';
+    if (!staffMap) initMap();
+    else setTimeout(() => staffMap.invalidateSize(), 100);
+  }
+  renderStaffDashboard();
+}
+
+// ── Toast ────────────────────────────────────────────
+function showToast(msg) {
+  const t = document.getElementById('staff-toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2500);
+}
+
+// ── Back to role selector ────────────────────────────
+function goBack() {
+  window.location.href = 'index.html#role-selector';
+}
+
+// Subscribe to state changes
+AppState.subscribe(() => renderStaffDashboard());
+
+// Initial render
+renderStaffDashboard();
+</script>
+</body>
+</html>
