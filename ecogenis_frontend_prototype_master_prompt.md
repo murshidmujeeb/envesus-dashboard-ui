@@ -2,9 +2,9 @@
 
 ## 1. Project Objective
 
-Improve the existing Envesus Smart Waste Management Dashboard into a polished, interactive frontend prototype that accurately communicates the intended product experience.
+Improve the existing Ecogenis Smart Waste Management Dashboard into a polished, interactive frontend prototype that accurately communicates the intended product experience.
 
-**Existing prototype:** https://envesus-dashboard-ui-v9su.vercel.app/
+**Existing prototype:** https://ecogenis-dashboard-ui-v9su.vercel.app/
 
 This is a frontend prototype, not a fully implemented production system. The objective is to demonstrate the product's intended functionality, workflows, data relationships, and user experiences without introducing unnecessary backend infrastructure.
 
@@ -181,7 +181,7 @@ This dashboard must remain phone-sized even when opened on a desktop or laptop.
 
 On desktop, centre the mobile-width interface rather than stretching it across the entire screen.
 
-Use the existing Envesus design system and brand identity.
+Use the existing Ecogenis design system and brand identity.
 
 ### Staff dashboard content
 
@@ -316,7 +316,7 @@ Use the supplied SellRecord mobile dashboard image as inspiration for layout pro
 
 Do not copy its brand colours, icons, typography, or content.
 
-Retain the existing Envesus visual identity.
+Retain the existing Ecogenis visual identity.
 
 ### Mobile
 
@@ -419,7 +419,7 @@ Use clear loading, empty, success, and error states where appropriate.
 
 Maintain a consistent design system across all three roles while giving each role the right information density.
 
-Do not change the Envesus colour palette or typography merely to imitate the reference image.
+Do not change the Ecogenis colour palette or typography merely to imitate the reference image.
 
 ## 16. Testing and Verification
 
@@ -527,7 +527,7 @@ The prototype is complete when:
 
 ## Final Instruction
 
-Build a **simple, polished, interactive frontend prototype** that accurately communicates the intended Envesus Smart Waste Management product.
+Build a **simple, polished, interactive frontend prototype** that accurately communicates the intended Ecogenis Smart Waste Management product.
 
 Do not overengineer it.
 

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════════
-// ENVESUS ADMIN DASHBOARD — dashboard.js
+// ECOGENIS ADMIN DASHBOARD — dashboard.js
 // Reads from AppState (state.js must be loaded first)
 // ═══════════════════════════════════════════════════════
 
@@ -605,7 +605,7 @@ function triggerExport() {
   const csv = rows.map(r => r.join(',')).join('\n');
   const a = document.createElement('a');
   a.href = 'data:text/csv;charset=utf-8,' + encodeURIComponent(csv);
-  a.download = `envesus_bins_${new Date().toISOString().split('T')[0]}.csv`;
+  a.download = `ecogenis_bins_${new Date().toISOString().split('T')[0]}.csv`;
   a.click();
   showToast('CSV export downloaded', 'success');
 }

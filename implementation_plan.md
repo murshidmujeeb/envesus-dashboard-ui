@@ -66,7 +66,7 @@ Muted:      #64748b (Slate)
 
 ## Proposed Changes
 
-### [NEW] [smartbin_dashboard_v2.html](file:///c:/Users/WORK/Desktop/Envesus/Dashboard/smartbin_dashboard_v2.html)
+### [NEW] [smartbin_dashboard_v2.html](file:///c:/Users/WORK/Desktop/Ecogenis/Dashboard/smartbin_dashboard_v2.html)
 
 Single self-contained HTML file with all CSS and JavaScript inline, containing:
 

@@ -1,5 +1,5 @@
 // ═══════════════════════════════════════════════════
-// ENVESUS SMART WASTE — SHARED FRONTEND STATE
+// ECOGENIS SMART WASTE — SHARED FRONTEND STATE
 // Single source of truth for all three dashboards
 // ═══════════════════════════════════════════════════
 
@@ -99,7 +99,7 @@ const BINS_DATA = [
 ];
 
 // ─── SHARED STATE ─────────────────────────────────────
-// Persisted to localStorage under key 'envesus_state'
+// Persisted to localStorage under key 'ecogenis_state'
 
 const DEFAULT_STATE = {
   // All 60 bins with collection status
@@ -175,7 +175,7 @@ const DEFAULT_STATE = {
 
 // ─── STATE MANAGEMENT ────────────────────────────────
 const AppState = (() => {
-  const STORAGE_KEY = 'envesus_state_v3';
+  const STORAGE_KEY = 'ecogenis_state_v3';
   let _state = null;
   const _listeners = [];
 
